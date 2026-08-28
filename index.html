@@ -1,227 +1,332 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
+  >
+
   <title>ET143 A1 Sign in</title>
 
+  <!-- Barcode scanner library -->
   <script src="https://unpkg.com/html5-qrcode"></script>
 
   <style>
-    :root{
-      --bg:#f4f4f4;
-      --card:#ffffff;
-      --text:#111827;
-      --muted:#6b7280;
-      --border:#d1d5db;
-      --primary:#0b5ed7;
-      --danger:#dc3545;
-      --shadow:0 6px 18px rgba(0,0,0,.08);
-      --r:14px;
-      --pad:14px;
+
+    :root {
+      --bg: #f4f4f4;
+      --card: #ffffff;
+      --text: #111827;
+      --muted: #6b7280;
+      --border: #d1d5db;
+      --primary: #0b5ed7;
+      --secondary: #334155;
+      --danger: #dc3545;
+      --shadow: 0 6px 18px rgba(0,0,0,.08);
+      --radius: 14px;
+      --padding: 14px;
     }
 
-    html, body {
-      height:100%;
-      margin:0;
-      background:var(--bg);
-      color:var(--text);
-      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+
+    /* =========================
+       PAGE
+       ========================= */
+
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+
+      font-family:
+        system-ui,
+        -apple-system,
+        Segoe UI,
+        Roboto,
+        Arial,
+        sans-serif;
     }
+
 
     .app {
-      min-height:100%;
+      min-height: 100%;
+
       padding:
-        max(var(--pad), env(safe-area-inset-top))
-        max(var(--pad), env(safe-area-inset-right))
-        max(var(--pad), env(safe-area-inset-bottom))
-        max(var(--pad), env(safe-area-inset-left));
-      box-sizing:border-box;
-      display:flex;
-      justify-content:center;
+        max(var(--padding), env(safe-area-inset-top))
+        max(var(--padding), env(safe-area-inset-right))
+        max(var(--padding), env(safe-area-inset-bottom))
+        max(var(--padding), env(safe-area-inset-left));
+
+      box-sizing: border-box;
+
+      display: flex;
+      justify-content: center;
     }
+
 
     .container {
-      width:100%;
-      max-width:520px;
+      width: 100%;
+      max-width: 520px;
     }
+
+
+    /* =========================
+       HEADER
+       ========================= */
 
     .header {
-      text-align:center;
-      margin:8px 0 12px;
+      text-align: center;
+      margin: 8px 0 12px;
     }
+
 
     .header h1 {
-      margin:0;
-      font-size:22px;
-      line-height:1.2;
+      margin: 0;
+      font-size: 22px;
+      line-height: 1.2;
     }
+
 
     .header p {
-      margin:6px 0 0;
-      color:var(--muted);
-      font-size:13px;
-      line-height:1.3;
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.3;
     }
+
+
+    /* =========================
+       FORM CARD
+       ========================= */
 
     .card {
-      background:var(--card);
-      border-radius:var(--r);
-      box-shadow:var(--shadow);
-      padding:14px;
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 14px;
     }
+
 
     label {
-      display:block;
-      margin-top:12px;
-      font-weight:650;
-      font-size:14px;
+      display: block;
+      margin-top: 12px;
+      font-weight: 650;
+      font-size: 14px;
     }
+
 
     input {
-      width:100%;
-      padding:12px;
-      font-size:16px;
-      margin-top:6px;
-      border-radius:10px;
-      border:1px solid var(--border);
-      box-sizing:border-box;
-      outline:none;
-      background:#fff;
+      width: 100%;
+      padding: 12px;
+      margin-top: 6px;
+
+      font-size: 16px;
+
+      border-radius: 10px;
+      border: 1px solid var(--border);
+
+      box-sizing: border-box;
+      outline: none;
+      background: #fff;
     }
+
 
     input:focus {
-      border-color:rgba(11,94,215,.6);
-      box-shadow:0 0 0 3px rgba(11,94,215,.15);
+      border-color: rgba(11,94,215,.6);
+
+      box-shadow:
+        0 0 0 3px rgba(11,94,215,.15);
     }
+
+
+    /* =========================
+       BUTTONS
+       ========================= */
 
     .btn {
-      margin-top:12px;
-      padding:12px;
-      width:100%;
-      font-size:16px;
-      border-radius:12px;
-      border:none;
-      background:var(--primary);
-      color:white;
-      font-weight:650;
-      cursor:pointer;
+      width: 100%;
+      margin-top: 12px;
+      padding: 12px;
+
+      font-size: 16px;
+      font-weight: 650;
+
+      border: none;
+      border-radius: 12px;
+
+      background: var(--primary);
+      color: white;
+
+      cursor: pointer;
     }
+
+
+    .btn:active {
+      transform: translateY(1px);
+    }
+
 
     .btn.secondary {
-      background:#334155;
+      background: var(--secondary);
     }
+
 
     .btn.danger {
-      background:var(--danger);
+      background: var(--danger);
     }
+
+
+    /* =========================
+       STATUS
+       ========================= */
 
     .status {
-      margin-top:12px;
-      padding:10px 12px;
-      background:#fff;
-      border-radius:12px;
-      border:1px solid #eef2f7;
-      font-size:14px;
-      white-space:pre-wrap;
-      text-align:center;
+      margin-top: 12px;
+      padding: 10px 12px;
+
+      background: #fff;
+
+      border-radius: 12px;
+      border: 1px solid #eef2f7;
+
+      font-size: 14px;
+      white-space: pre-wrap;
+      text-align: center;
     }
 
-    .linkwrap {
-      margin-top:12px;
-      text-align:center;
-    }
-
-    a {
-      color:var(--primary);
-      text-decoration:underline;
-      font-size:14px;
-    }
 
     .tiny {
-      margin-top:6px;
-      color:var(--muted);
-      font-size:12px;
-      text-align:center;
-      line-height:1.3;
+      margin-top: 6px;
+
+      color: var(--muted);
+
+      font-size: 12px;
+      line-height: 1.3;
+
+      text-align: center;
     }
 
-    /* Fullscreen scanner */
+
+    .linkwrap {
+      margin-top: 12px;
+      text-align: center;
+    }
+
+
+    a {
+      color: var(--primary);
+      text-decoration: underline;
+      font-size: 14px;
+    }
+
+
+    /* =========================
+       FULLSCREEN SCANNER
+       ========================= */
+
     #scannerOverlay {
-      position:fixed;
-      inset:0;
-      background:#000;
-      display:none;
-      flex-direction:column;
-      justify-content:center;
-      align-items:center;
-      z-index:9999;
+      position: fixed;
+      inset: 0;
+
+      display: none;
+
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+
+      background: #000;
+
+      z-index: 9999;
+
       padding:
         max(12px, env(safe-area-inset-top))
         max(12px, env(safe-area-inset-right))
         max(12px, env(safe-area-inset-bottom))
         max(12px, env(safe-area-inset-left));
-      box-sizing:border-box;
+
+      box-sizing: border-box;
     }
 
-    #readerWrap {
-      position:relative;
-      width:100%;
-      max-width:460px;
-      border-radius:14px;
-      overflow:hidden;
-    }
+
+    /*
+      IMPORTANT:
+      There is no second custom aiming box here.
+
+      html5-qrcode draws the actual scan region itself.
+    */
 
     #reader {
-      width:100%;
+      width: 100%;
+      max-width: 460px;
+
+      border-radius: 14px;
+      overflow: hidden;
     }
 
-    /* Visible barcode aiming box */
-    #aimBox {
-      position:absolute;
-      left:50%;
-      top:50%;
-      transform:translate(-50%, -50%);
-      border:3px solid rgba(255,255,255,.9);
-      border-radius:12px;
-      box-sizing:border-box;
-      width:360px;
-      height:70px;
-      pointer-events:none;
-      box-shadow:0 0 0 9999px rgba(0,0,0,.25);
-    }
 
     #scannerHint {
-      margin-top:12px;
-      color:rgba(255,255,255,.9);
-      font-size:14px;
-      text-align:center;
-      line-height:1.3;
-      max-width:520px;
+      margin-top: 14px;
+
+      color: rgba(255,255,255,.9);
+
+      font-size: 14px;
+      line-height: 1.3;
+
+      text-align: center;
+
+      max-width: 460px;
     }
 
+
     #closeScannerBtn {
-      margin-top:16px;
-      max-width:520px;
+      margin-top: 16px;
+      max-width: 460px;
     }
+
   </style>
+
 </head>
+
 
 <body>
 
+
+  <!-- =========================
+       MAIN FORM
+       ========================= -->
+
   <div class="app">
+
     <div class="container">
 
+
       <div class="header">
+
         <h1>ET143 A1 Sign in</h1>
-        <p>Scan student number → surname auto-fills from class list → submit</p>
+
+        <p>
+          Scan student number → surname auto-fills from class list → submit
+        </p>
+
       </div>
+
 
       <div class="card">
 
+
         <form id="entryForm">
 
-          <label>Student Number</label>
+
+          <!-- STUDENT NUMBER -->
+
+          <label for="studentNumber">
+            Student Number
+          </label>
+
 
           <input
             id="studentNumber"
@@ -233,6 +338,9 @@
             autocomplete="off"
           >
 
+
+          <!-- SCAN BUTTON -->
+
           <button
             class="btn secondary"
             type="button"
@@ -241,17 +349,28 @@
             Scan Barcode
           </button>
 
+
           <div class="tiny">
             Surname will auto-fill if found (still editable).
           </div>
 
-          <label>Surname</label>
+
+          <!-- SURNAME -->
+
+          <label for="surname">
+            Surname
+          </label>
+
 
           <input
             id="surname"
             required
+            type="text"
             autocomplete="off"
           >
+
+
+          <!-- SUBMIT -->
 
           <button
             class="btn"
@@ -260,40 +379,63 @@
             Submit
           </button>
 
+
         </form>
 
-        <div id="status" class="status">
+
+        <!-- STATUS -->
+
+        <div
+          id="status"
+          class="status"
+        >
           Ready
         </div>
 
+
+        <!-- NEW SUBMISSION -->
+
         <div class="linkwrap">
-          <a href="#" onclick="newSubmission(); return false;">
+
+          <a
+            href="#"
+            onclick="newSubmission(); return false;"
+          >
             New submission
           </a>
+
         </div>
+
 
         <div class="tiny">
           If scanning is slow, move the phone slightly closer or farther
           until the barcode snaps into focus.
         </div>
 
+
       </div>
+
     </div>
+
   </div>
 
 
-  <!-- Fullscreen barcode scanner -->
+
+  <!-- =========================
+       FULLSCREEN SCANNER
+       ========================= -->
 
   <div id="scannerOverlay">
 
-    <div id="readerWrap">
-      <div id="reader"></div>
-      <div id="aimBox"></div>
-    </div>
+
+    <div id="reader"></div>
+
 
     <div id="scannerHint">
-      Align the barcode inside the box. Hold steady for a second.
+      Align the barcode inside the clear scanning box.
+      Hold the phone steady for a moment.
     </div>
+
 
     <button
       id="closeScannerBtn"
@@ -304,501 +446,779 @@
       Cancel
     </button>
 
+
   </div>
 
 
-<script>
 
-  // ==================================================
-  // CONFIG
-  // ==================================================
+  <script>
 
-  // Replace this with the Apps Script Web App URL
-  // ending in /exec
+    // ==================================================
+    // CONFIG
+    // ==================================================
 
-  const API_URL = "https://script.google.com/macros/s/AKfycby5HkkPSt4bgz4qMiVZX8Krs6_RPyeUcDjzEFJafYH2c8XxIv5PRQrA4EX2hZJ9FKhvuA/exec";
+    /*
+      Replace this with the Web App URL from
+      Google Apps Script.
 
+      It must end in /exec
+    */
 
-  // ==================================================
-  // ELEMENTS
-  // ==================================================
-
-  const formEl =
-    document.getElementById("entryForm");
-
-  const statusEl =
-    document.getElementById("status");
-
-  const studentInput =
-    document.getElementById("studentNumber");
-
-  const surnameInput =
-    document.getElementById("surname");
-
-  const overlay =
-    document.getElementById("scannerOverlay");
-
-  const aimBoxEl =
-    document.getElementById("aimBox");
+    const API_URL =  "https://script.google.com/macros/s/AKfycby5HkkPSt4bgz4qMiVZX8Krs6_RPyeUcDjzEFJafYH2c8XxIv5PRQrA4EX2hZJ9FKhvuA/exec";
 
 
-  // ==================================================
-  // LOOKUP STATE
-  // ==================================================
 
-  let lastLookupStudent = "";
-  let lookupTimer = null;
-  let surnameWasAutoFilled = false;
+    // ==================================================
+    // ELEMENTS
+    // ==================================================
 
+    const formEl =
+      document.getElementById("entryForm");
 
-  function setStatus(msg) {
-    statusEl.innerText = msg;
-  }
+    const statusEl =
+      document.getElementById("status");
 
+    const studentInput =
+      document.getElementById("studentNumber");
 
-  // ==================================================
-  // SURNAME LOOKUP
-  // ==================================================
+    const surnameInput =
+      document.getElementById("surname");
 
-  async function lookupSurname(studentNumber) {
-
-    const sn =
-      String(studentNumber || "").trim();
-
-    if (!sn) return;
-
-    if (sn === lastLookupStudent) return;
-
-    lastLookupStudent = sn;
-
-    setStatus("Looking up surname…");
-
-    try {
-
-      const res = await fetch(API_URL, {
-        method: "POST",
-        body: JSON.stringify({
-          action: "lookup",
-          studentNumber: sn
-        })
-      });
-
-      const data = await res.json();
+    const overlay =
+      document.getElementById("scannerOverlay");
 
 
-      if (
-        data &&
-        data.ok &&
-        data.found &&
-        data.surname
-      ) {
 
-        const current =
-          surnameInput.value.trim();
+    // ==================================================
+    // STATE
+    // ==================================================
 
-        if (
-          !current ||
-          surnameWasAutoFilled
-        ) {
-          surnameInput.value =
-            data.surname;
+    let scanner = null;
 
-          surnameWasAutoFilled = true;
-        }
+    let lastLookupStudent = "";
 
-        setStatus(
-          "Surname found ✔ (editable)"
-        );
+    let lookupTimer = null;
 
-      }
+    let surnameWasAutoFilled = false;
 
-      else if (data && data.ok) {
 
-        surnameWasAutoFilled = false;
 
-        setStatus(
-          "Surname not found (type it manually)."
-        );
+    // ==================================================
+    // STATUS
+    // ==================================================
 
-      }
+    function setStatus(message) {
 
-      else {
-
-        surnameWasAutoFilled = false;
-
-        setStatus(
-          "Lookup failed (type surname manually)."
-        );
-
-      }
+      statusEl.innerText = message;
 
     }
 
-    catch (err) {
 
-      console.error(err);
 
-      surnameWasAutoFilled = false;
+    // ==================================================
+    // SURNAME LOOKUP
+    // ==================================================
 
-      setStatus(
-        "Lookup failed (offline?) — type surname manually."
-      );
+    async function lookupSurname(studentNumber) {
 
-    }
-  }
+      const sn =
+        String(studentNumber || "").trim();
 
 
-  function scheduleLookup() {
-
-    clearTimeout(lookupTimer);
-
-    lookupTimer =
-      setTimeout(
-        () =>
-          lookupSurname(
-            studentInput.value
-          ),
-        300
-      );
-  }
-
-
-  studentInput.addEventListener(
-    "input",
-    () => {
-
-      surnameWasAutoFilled = false;
-
-      scheduleLookup();
-
-    }
-  );
-
-
-  studentInput.addEventListener(
-    "blur",
-    () =>
-      lookupSurname(
-        studentInput.value
-      )
-  );
-
-
-  // ==================================================
-  // BARCODE SCANNER
-  // ==================================================
-
-  let scanner = null;
-
-
-  function computeScanBox() {
-
-    // Barcode is approximately 42 mm x 6 mm.
-    // Wide and short scan region works best.
-
-    const boxWidth =
-      Math.min(
-        420,
-        Math.floor(
-          window.innerWidth * 0.92
-        )
-      );
-
-    const boxHeight =
-      Math.max(
-        55,
-        Math.floor(
-          boxWidth / 5.2
-        )
-      );
-
-    return {
-      boxWidth,
-      boxHeight
-    };
-  }
-
-
-  function openScanner() {
-
-    overlay.style.display = "flex";
-
-    startScanner();
-
-  }
-
-
-  async function startScanner() {
-
-    if (scanner) return;
-
-
-    document.getElementById(
-      "reader"
-    ).innerHTML = "";
-
-
-    scanner =
-      new Html5Qrcode("reader");
-
-
-    const {
-      boxWidth,
-      boxHeight
-    } = computeScanBox();
-
-
-    aimBoxEl.style.width =
-      boxWidth + "px";
-
-    aimBoxEl.style.height =
-      boxHeight + "px";
-
-
-    try {
-
-      await scanner.start(
-
-        {
-          facingMode: "environment"
-        },
-
-        {
-          fps: 15,
-
-          qrbox: {
-            width: boxWidth,
-            height: boxHeight
-          },
-
-          videoConstraints: {
-
-            facingMode:
-              "environment",
-
-            width: {
-              ideal: 1280
-            },
-
-            height: {
-              ideal: 720
-            }
-
-          },
-
-          experimentalFeatures: {
-            useBarCodeDetectorIfSupported:
-              true
-          }
-
-        },
-
-        onScanSuccess
-
-      );
-
-    }
-
-    catch (err) {
-
-      console.error(err);
-
-      setStatus(
-        "Camera start failed: " +
-        (err?.message || err)
-      );
-
-      closeScanner();
-
-    }
-  }
-
-
-  function onScanSuccess(decodedText) {
-
-    const sn =
-      decodedText.trim();
-
-    studentInput.value = sn;
-
-    closeScanner();
-
-
-    setStatus(
-      "Student number scanned ✔\nLooking up surname…"
-    );
-
-
-    lookupSurname(sn)
-      .finally(() => {
-        surnameInput.focus();
-      });
-
-  }
-
-
-  function closeScanner() {
-
-    if (scanner) {
-
-      scanner
-        .stop()
-        .catch(() => {});
-
-      scanner = null;
-
-    }
-
-    overlay.style.display =
-      "none";
-
-  }
-
-
-  // ==================================================
-  // NEW SUBMISSION
-  // ==================================================
-
-  function newSubmission() {
-
-    closeScanner();
-
-    studentInput.value = "";
-
-    surnameInput.value = "";
-
-    lastLookupStudent = "";
-
-    surnameWasAutoFilled = false;
-
-    setStatus("Ready");
-
-    studentInput.focus();
-
-  }
-
-
-  // ==================================================
-  // SUBMIT
-  // ==================================================
-
-  formEl.addEventListener(
-    "submit",
-    async (e) => {
-
-      e.preventDefault();
-
-
-      if (!formEl.checkValidity()) {
-
-        formEl.reportValidity();
-
+      if (!sn) {
         return;
-
       }
 
 
-      const payload = {
-
-        action: "submit",
-
-        studentNumber:
-          studentInput.value.trim(),
-
-        surname:
-          surnameInput.value.trim()
-
-      };
+      if (sn === lastLookupStudent) {
+        return;
+      }
 
 
-      setStatus("Saving…");
+      lastLookupStudent = sn;
+
+
+      setStatus("Looking up surname…");
 
 
       try {
 
-        const res =
+        const response =
           await fetch(
             API_URL,
             {
               method: "POST",
 
-              body:
-                JSON.stringify(
-                  payload
-                )
+              body: JSON.stringify({
+                action: "lookup",
+                studentNumber: sn
+              })
             }
           );
 
 
         const data =
-          await res.json();
+          await response.json();
 
 
-        if (data && data.ok) {
 
-          setStatus("Saved ✔");
+        // Student found
 
-          newSubmission();
+        if (
+          data &&
+          data.ok &&
+          data.found &&
+          data.surname
+        ) {
+
+          const currentSurname =
+            surnameInput.value.trim();
+
+
+          if (
+            !currentSurname ||
+            surnameWasAutoFilled
+          ) {
+
+            surnameInput.value =
+              data.surname;
+
+            surnameWasAutoFilled =
+              true;
+
+          }
+
+
+          setStatus(
+            "Surname found ✔ (editable)"
+          );
 
         }
 
-        else {
+
+        // Student number not found
+
+        else if (
+          data &&
+          data.ok
+        ) {
+
+          surnameWasAutoFilled =
+            false;
+
 
           setStatus(
-            "Save failed: " +
-            (
-              data?.error ||
-              "Unknown error"
-            )
+            "Surname not found — type it manually."
+          );
+
+        }
+
+
+        // Server returned error
+
+        else {
+
+          surnameWasAutoFilled =
+            false;
+
+
+          setStatus(
+            "Lookup failed — type surname manually."
           );
 
         }
 
       }
 
-      catch (err) {
 
-        console.error(err);
+      catch (error) {
+
+        console.error(error);
+
+
+        surnameWasAutoFilled =
+          false;
+
 
         setStatus(
-          "Save failed. Check network / API URL."
+          "Lookup failed — type surname manually."
         );
 
       }
 
     }
-  );
 
 
-  // Keep aiming box sensible
-  // if phone orientation changes
 
-  window.addEventListener(
-    "resize",
-    () => {
+    // ==================================================
+    // LOOKUP WHEN STUDENT NUMBER IS TYPED
+    // ==================================================
 
-      if (
-        overlay.style.display
-        !== "flex"
-      ) return;
+    function scheduleLookup() {
+
+      clearTimeout(lookupTimer);
 
 
-      const {
-        boxWidth,
-        boxHeight
-      } = computeScanBox();
+      lookupTimer =
+        setTimeout(
+          () => {
 
+            lookupSurname(
+              studentInput.value
+            );
 
-      aimBoxEl.style.width =
-        boxWidth + "px";
-
-      aimBoxEl.style.height =
-        boxHeight + "px";
+          },
+          300
+        );
 
     }
-  );
 
-</script>
+
+
+    studentInput.addEventListener(
+      "input",
+      () => {
+
+        surnameWasAutoFilled =
+          false;
+
+        /*
+          Reset this so changing a manually entered
+          student number triggers a new lookup.
+        */
+
+        lastLookupStudent = "";
+
+        scheduleLookup();
+
+      }
+    );
+
+
+
+    studentInput.addEventListener(
+      "blur",
+      () => {
+
+        lookupSurname(
+          studentInput.value
+        );
+
+      }
+    );
+
+
+
+    // ==================================================
+    // SCAN BOX
+    // ==================================================
+
+    /*
+      The student-card barcode is approximately
+      42 mm wide × 6 mm high.
+
+      This gives html5-qrcode a wide, short
+      detection area.
+
+      The function receives the ACTUAL camera
+      view dimensions from html5-qrcode.
+
+      This is important because it keeps the
+      visible clear box aligned with the
+      detection region.
+    */
+
+    function computeScanBox(
+      viewfinderWidth,
+      viewfinderHeight
+    ) {
+
+      /*
+        Use up to about 90% of the actual
+        camera width, with a maximum of 420 px.
+      */
+
+      const width =
+        Math.min(
+          420,
+          Math.floor(
+            viewfinderWidth * 0.90
+          )
+        );
+
+
+      /*
+        Keep the reader box wide and short.
+      */
+
+      const height =
+        Math.max(
+          55,
+          Math.floor(
+            width / 5.2
+          )
+        );
+
+
+      return {
+        width: width,
+        height: height
+      };
+
+    }
+
+
+
+    // ==================================================
+    // OPEN SCANNER
+    // ==================================================
+
+    function openScanner() {
+
+      overlay.style.display =
+        "flex";
+
+
+      /*
+        Starting on the next animation frame gives
+        the browser time to display the overlay
+        before html5-qrcode measures its dimensions.
+      */
+
+      requestAnimationFrame(
+        () => {
+
+          startScanner();
+
+        }
+      );
+
+    }
+
+
+
+    // ==================================================
+    // START SCANNER
+    // ==================================================
+
+    async function startScanner() {
+
+      if (scanner) {
+        return;
+      }
+
+
+      const reader =
+        document.getElementById("reader");
+
+
+      reader.innerHTML = "";
+
+
+      scanner =
+        new Html5Qrcode("reader");
+
+
+      try {
+
+        await scanner.start(
+
+          // Prefer rear camera
+          {
+            facingMode: "environment"
+          },
+
+
+          // Scanner configuration
+          {
+
+            fps: 15,
+
+
+            /*
+              html5-qrcode calculates this against
+              the actual camera view.
+
+              This is the ONLY reader box.
+            */
+
+            qrbox: computeScanBox,
+
+
+            /*
+              Request decent resolution.
+
+              720p gave good results with the
+              narrow student-card barcode.
+            */
+
+            videoConstraints: {
+
+              facingMode:
+                "environment",
+
+              width: {
+                ideal: 1280
+              },
+
+              height: {
+                ideal: 720
+              }
+
+            },
+
+
+            experimentalFeatures: {
+
+              useBarCodeDetectorIfSupported:
+                true
+
+            }
+
+          },
+
+
+          // Successful scan
+          onScanSuccess
+
+        );
+
+      }
+
+
+      catch (error) {
+
+        console.error(error);
+
+
+        setStatus(
+          "Camera start failed: " +
+          (
+            error?.message ||
+            error
+          )
+        );
+
+
+        await closeScanner();
+
+      }
+
+    }
+
+
+
+    // ==================================================
+    // SUCCESSFUL BARCODE SCAN
+    // ==================================================
+
+    async function onScanSuccess(
+      decodedText
+    ) {
+
+      /*
+        Ignore another result while we're already
+        shutting down the scanner.
+      */
+
+      if (!scanner) {
+        return;
+      }
+
+
+      const studentNumber =
+        String(decodedText || "").trim();
+
+
+      if (!studentNumber) {
+        return;
+      }
+
+
+      /*
+        Put scanned number into form.
+      */
+
+      studentInput.value =
+        studentNumber;
+
+
+      /*
+        Force lookup even if this number happened
+        to be looked up previously.
+      */
+
+      lastLookupStudent = "";
+
+
+      /*
+        Close camera first.
+      */
+
+      await closeScanner();
+
+
+      setStatus(
+        "Student number scanned ✔\nLooking up surname…"
+      );
+
+
+      /*
+        Look up surname automatically.
+      */
+
+      await lookupSurname(
+        studentNumber
+      );
+
+
+      /*
+        Move cursor to surname so it can still
+        be corrected manually if necessary.
+      */
+
+      surnameInput.focus();
+
+    }
+
+
+
+    // ==================================================
+    // CLOSE SCANNER
+    // ==================================================
+
+    async function closeScanner() {
+
+      if (scanner) {
+
+        const activeScanner =
+          scanner;
+
+
+        /*
+          Set this to null immediately so another
+          successful scan cannot fire while the
+          camera is closing.
+        */
+
+        scanner = null;
+
+
+        try {
+
+          await activeScanner.stop();
+
+        }
+
+        catch (error) {
+
+          console.log(
+            "Scanner already stopped."
+          );
+
+        }
+
+
+        try {
+
+          activeScanner.clear();
+
+        }
+
+        catch (error) {
+
+          // Nothing further required.
+
+        }
+
+      }
+
+
+      overlay.style.display =
+        "none";
+
+    }
+
+
+
+    // ==================================================
+    // NEW SUBMISSION
+    // ==================================================
+
+    async function newSubmission() {
+
+      await closeScanner();
+
+
+      studentInput.value = "";
+
+      surnameInput.value = "";
+
+
+      lastLookupStudent = "";
+
+      surnameWasAutoFilled =
+        false;
+
+
+      setStatus("Ready");
+
+
+      studentInput.focus();
+
+    }
+
+
+
+    // ==================================================
+    // SUBMIT FORM
+    // ==================================================
+
+    formEl.addEventListener(
+      "submit",
+
+      async (event) => {
+
+        event.preventDefault();
+
+
+        /*
+          Browser validation.
+        */
+
+        if (!formEl.checkValidity()) {
+
+          formEl.reportValidity();
+
+          return;
+
+        }
+
+
+        const studentNumber =
+          studentInput.value.trim();
+
+
+        const surname =
+          surnameInput.value.trim();
+
+
+
+        const payload = {
+
+          action: "submit",
+
+          studentNumber:
+            studentNumber,
+
+          surname:
+            surname
+
+        };
+
+
+        setStatus("Saving…");
+
+
+        try {
+
+          const response =
+            await fetch(
+              API_URL,
+              {
+                method: "POST",
+
+                /*
+                  Deliberately do NOT add:
+
+                  Content-Type: application/json
+
+                  Apps Script works more reliably
+                  cross-origin from GitHub Pages
+                  when the JSON is sent as the
+                  plain request body.
+                */
+
+                body:
+                  JSON.stringify(
+                    payload
+                  )
+              }
+            );
+
+
+          const data =
+            await response.json();
+
+
+
+          if (
+            data &&
+            data.ok
+          ) {
+
+            /*
+              Clear the fields first.
+            */
+
+            studentInput.value = "";
+
+            surnameInput.value = "";
+
+            lastLookupStudent = "";
+
+            surnameWasAutoFilled =
+              false;
+
+
+            /*
+              Leave confirmation visible instead
+              of immediately replacing it with
+              "Ready".
+            */
+
+            setStatus("Saved ✔");
+
+
+            studentInput.focus();
+
+          }
+
+
+          else {
+
+            setStatus(
+              "Save failed: " +
+              (
+                data?.error ||
+                "Unknown error"
+              )
+            );
+
+          }
+
+        }
+
+
+        catch (error) {
+
+          console.error(error);
+
+
+          setStatus(
+            "Save failed. Check network / API URL."
+          );
+
+        }
+
+      }
+
+    );
+
+
+  </script>
+
 
 </body>
+
 </html>
