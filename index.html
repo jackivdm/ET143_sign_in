@@ -177,7 +177,7 @@
 
 
     /* =========================================
-       LANDING PAGE
+       HOME
        ========================================= */
 
     #landingView {
@@ -201,14 +201,18 @@
 
     .counter {
       flex: 1;
+
       background: var(--card);
+
       border-radius: 12px;
       padding: 10px;
+
       text-align: center;
     }
 
     .counter-label {
       color: var(--muted);
+
       font-size: 11px;
       font-weight: 700;
       letter-spacing: 1px;
@@ -216,8 +220,10 @@
 
     .counter-number {
       margin-top: 2px;
+
       font-size: 30px;
       font-weight: 800;
+
       line-height: 1;
     }
 
@@ -232,6 +238,7 @@
 
     #confirmation {
       height: 68px;
+
       margin-bottom: 10px;
 
       display: flex;
@@ -239,10 +246,12 @@
       justify-content: center;
 
       background: var(--card);
+
       border-radius: 12px;
 
       font-size: 24px;
       font-weight: 800;
+
       text-align: center;
 
       transition:
@@ -262,8 +271,11 @@
 
     #readerContainer {
       position: relative;
+
       width: 100%;
+
       background: #000;
+
       border-radius: 14px;
       overflow: hidden;
     }
@@ -281,6 +293,7 @@
       background: rgba(22, 163, 74, .35);
 
       pointer-events: none;
+
       z-index: 100;
     }
 
@@ -317,6 +330,7 @@
     #recentList {
       margin: 0;
       padding: 0;
+
       list-style: none;
     }
 
@@ -406,6 +420,7 @@
       Choose a sign-in method
     </div>
 
+
     <div class="card landing-card">
 
       <button
@@ -415,6 +430,7 @@
       >
         Rapid Card Scanner
       </button>
+
 
       <button
         class="large secondary"
@@ -643,10 +659,11 @@
 
 
   /*
-    Ignore the SAME barcode for 2 seconds.
+    Ignore the SAME valid student number for
+    2 seconds.
 
-    Different student cards can still be
-    scanned immediately one after another.
+    A different student card can still be
+    scanned immediately.
   */
 
   const DUPLICATE_LOCK_MS =
@@ -655,7 +672,7 @@
 
   /*
     Maximum number of entries uploaded
-    to Google in one batch.
+    in one request.
   */
 
   const BATCH_SIZE =
@@ -676,31 +693,110 @@
   // ==================================================
 
   /*
-    Valid student number:
+    A valid student number must:
 
-    - exactly 8 digits
-    - numbers only
-    - first digit must be 1, 2 or 3
+    1. Be exactly 8 digits
+    2. Start with 1, 2 or 3
+    3. Pass the modulus-11 checksum
 
-    Examples:
 
-    12345678  VALID
-    23456789  VALID
-    34567890  VALID
+    CHECKSUM:
 
-    02345678  INVALID
-    42345678  INVALID
-    1234567   INVALID
-    123456789 INVALID
-    12A45678  INVALID
+    Position:  1 2 3 4 5 6 7 8
+    Weight:    8 7 6 5 4 3 2 1
+
+    Multiply each digit by its weight.
+
+    Add the results.
+
+    The total must be exactly divisible by 11.
+
+
+    Example:
+
+    29062454
+
+    2×8 = 16
+    9×7 = 63
+    0×6 =  0
+    6×5 = 30
+    2×4 =  8
+    4×3 = 12
+    5×2 = 10
+    4×1 =  4
+
+    Total = 143
+
+    143 % 11 = 0
+
+    VALID
   */
 
   function isValidStudentNumber(
     value
   ) {
 
-    return /^[123]\d{7}$/.test(
-      String(value).trim()
+    const studentNumber =
+      String(
+        value || ""
+      ).trim();
+
+
+
+    /*
+      First check:
+
+      exactly 8 numeric digits
+      starting with 1, 2 or 3
+    */
+
+    if (
+      !/^[123]\d{7}$/.test(
+        studentNumber
+      )
+    ) {
+
+      return false;
+
+    }
+
+
+
+    /*
+      Modulus-11 checksum.
+    */
+
+    const weights =
+      [8, 7, 6, 5, 4, 3, 2, 1];
+
+
+    let total =
+      0;
+
+
+    for (
+      let i = 0;
+      i < 8;
+      i++
+    ) {
+
+      total +=
+        Number(
+          studentNumber[i]
+        ) *
+        weights[i];
+
+    }
+
+
+
+    /*
+      Valid only when the weighted total
+      is exactly divisible by 11.
+    */
+
+    return (
+      total % 11 === 0
     );
 
   }
@@ -812,7 +908,8 @@
   // RECOVER UNSAVED QUEUE
   // ==================================================
 
-  let uploadQueue = [];
+  let uploadQueue =
+    [];
 
 
   try {
@@ -828,7 +925,8 @@
 
   catch (error) {
 
-    uploadQueue = [];
+    uploadQueue =
+      [];
 
   }
 
@@ -867,14 +965,6 @@
   // ==================================================
   // AUDIO
   // ==================================================
-
-  /*
-    Prime the audio system while the user is
-    pressing a button.
-
-    This improves beep reliability on mobile
-    browsers, particularly iPhones.
-  */
 
   function primeAudio() {
 
@@ -940,11 +1030,13 @@
 
 
       const oscillator =
-        audioContext.createOscillator();
+        audioContext
+          .createOscillator();
 
 
       const gain =
-        audioContext.createGain();
+        audioContext
+          .createGain();
 
 
       oscillator.connect(
@@ -991,7 +1083,9 @@
   // NAVIGATION
   // ==================================================
 
-  function showView(view) {
+  function showView(
+    view
+  ) {
 
     landingView.classList.remove(
       "active"
@@ -1017,6 +1111,7 @@
   async function goHome() {
 
     await stopScanner();
+
 
     showView(
       landingView
@@ -1064,11 +1159,6 @@
 
 
   async function goToScanner() {
-
-    /*
-      Prime audio while this is still associated
-      with the user's button press.
-    */
 
     primeAudio();
 
@@ -1453,25 +1543,19 @@
 
 
     /*
-      ==================================================
-      VALIDATION
+      IMPORTANT:
 
-      Do absolutely nothing unless the decoded
-      value is a valid student number.
+      html5-qrcode may decode many different
+      barcode formats.
 
-      It must:
-        - contain exactly 8 digits
-        - start with 1, 2 or 3
+      We do not assume which barcode format
+      the university card uses.
 
-      A bad barcode read therefore gets:
+      Instead, we validate the RESULT.
 
-        NO beep
-        NO vibration
-        NO green flash
-        NO SCANNED increment
-        NO queue entry
-        NO Google Sheets entry
-      ==================================================
+      If the decoded value does not satisfy
+      the student-number rules, it is silently
+      ignored.
     */
 
     if (
@@ -1492,14 +1576,14 @@
 
 
     /*
-      ==================================================
-      2-SECOND SAME-CARD LOCKOUT
+      TWO-SECOND SAME-NUMBER LOCKOUT.
 
-      This only blocks the SAME student number.
+      This only prevents the same card from
+      being accepted repeatedly while it remains
+      in front of the camera.
 
-      A different valid card can be accepted
+      A different valid card can be scanned
       immediately.
-      ==================================================
     */
 
     if (
@@ -1520,7 +1604,7 @@
 
 
     /*
-      Clean old values out of memory.
+      Clean old duplicate-lock entries.
     */
 
     for (
@@ -1544,9 +1628,14 @@
 
 
     /*
-      Accept the student immediately.
+      The number has now passed:
 
-      We do NOT wait for Google Sheets.
+      ✓ 8-digit check
+      ✓ first-digit check
+      ✓ modulus-11 checksum
+      ✓ 2-second same-card check
+
+      Accept it.
     */
 
     acceptEntry(
@@ -1585,19 +1674,16 @@
     };
 
 
-    if (
-      !entry.studentNumber
-    ) {
-
-      return;
-
-    }
-
-
     uploadQueue.push(
       entry
     );
 
+
+    /*
+      SCANNED increases immediately.
+
+      We do NOT wait for Google Sheets.
+    */
 
     scannedCount++;
 
@@ -1618,9 +1704,9 @@
 
 
     /*
-      Start uploading in the background.
+      Start background upload.
 
-      Scanner remains available immediately.
+      Scanner remains free for the next card.
     */
 
     processUploadQueue();
@@ -1646,8 +1732,10 @@
 
 
     /*
-      Apply exactly the same student-number
-      validation as the barcode scanner.
+      Manual entries use exactly the same
+      validation as barcode scans.
+
+      This also catches typing mistakes.
     */
 
     if (
@@ -1657,7 +1745,7 @@
     ) {
 
       manualConfirmation.textContent =
-        "Must be 8 digits and start with 1, 2 or 3";
+        "Invalid student number";
 
 
       manualConfirmation.className =
@@ -1726,7 +1814,7 @@
 
 
   /*
-    Press Enter on the keyboard to save.
+    Pressing Enter saves the manual entry.
   */
 
   manualStudentNumber.addEventListener(
@@ -1750,9 +1838,10 @@
 
 
   /*
-    Remove anything except digits if somebody
-    pastes or types unusual characters into
-    the manual field.
+    Manual input:
+
+    Remove non-numeric characters and
+    prevent more than 8 digits.
   */
 
   manualStudentNumber.addEventListener(
@@ -1782,7 +1871,8 @@
     */
 
     confirmationEl.textContent =
-      "✓ " + barcode;
+      "✓ " +
+      barcode;
 
 
     confirmationEl.classList.add(
@@ -1814,8 +1904,10 @@
 
 
     /*
-      Return to ready state quickly so the next
-      student can be scanned.
+      Return to Ready quickly.
+
+      The scanner itself remains running
+      throughout this process.
     */
 
     setTimeout(
@@ -1836,7 +1928,7 @@
 
 
     /*
-      Vibration.
+      Vibration where supported.
     */
 
     if (
@@ -1852,7 +1944,7 @@
 
 
     /*
-      Beep.
+      Audible confirmation.
     */
 
     playBeep();
@@ -1876,8 +1968,9 @@
 
 
     /*
-      Local identifier used only for updating
-      the on-screen recent list.
+      This identifier exists only on the phone
+      so that the recent-entry display can be
+      changed from "waiting" to "saved".
 
       It is NOT sent to Google Sheets.
     */
@@ -1921,7 +2014,7 @@
 
 
     /*
-      Keep only the last 8 entries visible.
+      Show only the eight most recent entries.
     */
 
     while (
@@ -1943,7 +2036,7 @@
 
 
   // ==================================================
-  // MARK RECENT ENTRY AS SAVED
+  // MARK RECENT ENTRY SAVED
   // ==================================================
 
   function markEntrySaved(
@@ -1999,7 +2092,7 @@
   async function processUploadQueue() {
 
     /*
-      Only allow one uploader to operate at
+      Only one uploader can operate at
       a time on this phone.
     */
 
@@ -2030,8 +2123,10 @@
     try {
 
       /*
-        Continue until everything has been saved
-        or we encounter a network/server error.
+        Keep sending batches until:
+
+        - everything is saved, or
+        - a network/server error occurs.
       */
 
       while (
@@ -2039,10 +2134,10 @@
       ) {
 
         /*
-          Take the first entries from the queue.
+          Take up to BATCH_SIZE entries.
 
           They remain in the real queue until
-          Google confirms that they were saved.
+          Google confirms the write.
         */
 
         const batch =
@@ -2079,13 +2174,15 @@
                   "POST",
 
                 /*
-                  Do NOT add:
+                  IMPORTANT:
+
+                  Do not add:
 
                   Content-Type: application/json
 
-                  Sending the JSON as the plain
-                  request body avoids unnecessary
-                  CORS problems with Apps Script.
+                  Sending JSON as the plain POST
+                  body avoids unnecessary CORS
+                  problems with Apps Script.
                 */
 
                 body:
@@ -2132,8 +2229,9 @@
 
 
           /*
-            Only remove the batch if the server
-            confirms every entry was saved.
+            Do not remove anything unless Google
+            confirms that the entire batch was
+            written.
           */
 
           if (
@@ -2149,6 +2247,10 @@
 
 
 
+          /*
+            Update recent-entry display.
+          */
+
           for (
             const entry of batch
           ) {
@@ -2162,10 +2264,10 @@
 
 
           /*
-            Google has confirmed the save.
+            Google has confirmed the batch.
 
-            We can now safely remove these entries
-            from the phone's pending queue.
+            Remove those entries from the
+            pending queue.
           */
 
           uploadQueue.splice(
@@ -2211,9 +2313,9 @@
 
 
           /*
-            Do not delete anything.
+            Nothing is deleted.
 
-            The pending entries remain on the
+            All pending entries stay on the
             phone and will be retried.
           */
 
@@ -2307,9 +2409,9 @@
 
 
   /*
-    If the browser was closed/refreshed while
+    If the page was closed or refreshed while
     entries were waiting to upload, recover
-    those entries and try again.
+    them from localStorage and try again.
   */
 
   if (
