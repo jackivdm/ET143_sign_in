@@ -11,34 +11,30 @@
 
   <title>ET143 A1 Sign in</title>
 
-  <!-- Barcode scanner library -->
   <script src="https://unpkg.com/html5-qrcode"></script>
 
   <style>
-
     :root {
-      --bg: #f4f4f4;
-      --card: #ffffff;
-      --text: #111827;
-      --muted: #6b7280;
-      --border: #d1d5db;
+      --bg: #111827;
+      --card: #1f2937;
+      --text: #ffffff;
+      --muted: #9ca3af;
       --primary: #0b5ed7;
-      --secondary: #334155;
-      --danger: #dc3545;
-      --shadow: 0 6px 18px rgba(0,0,0,.08);
-      --radius: 14px;
-      --padding: 14px;
+      --secondary: #475569;
+      --success: #16a34a;
+      --danger: #dc2626;
+      --warning: #f59e0b;
+      --border: #374151;
     }
 
-
-    /* =========================
-       PAGE
-       ========================= */
+    * {
+      box-sizing: border-box;
+    }
 
     html,
     body {
-      height: 100%;
       margin: 0;
+      min-height: 100%;
       background: var(--bg);
       color: var(--text);
 
@@ -51,369 +47,394 @@
         sans-serif;
     }
 
-
-    .app {
-      min-height: 100%;
-
-      padding:
-        max(var(--padding), env(safe-area-inset-top))
-        max(var(--padding), env(safe-area-inset-right))
-        max(var(--padding), env(safe-area-inset-bottom))
-        max(var(--padding), env(safe-area-inset-left));
-
-      box-sizing: border-box;
-
-      display: flex;
-      justify-content: center;
-    }
-
-
-    .container {
-      width: 100%;
-      max-width: 520px;
-    }
-
-
-    /* =========================
-       HEADER
-       ========================= */
-
-    .header {
-      text-align: center;
-      margin: 8px 0 12px;
-    }
-
-
-    .header h1 {
-      margin: 0;
-      font-size: 22px;
-      line-height: 1.2;
-    }
-
-
-    .header p {
-      margin: 6px 0 0;
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.3;
-    }
-
-
-    /* =========================
-       FORM CARD
-       ========================= */
-
-    .card {
-      background: var(--card);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      padding: 14px;
-    }
-
-
-    label {
-      display: block;
-      margin-top: 12px;
-      font-weight: 650;
-      font-size: 14px;
-    }
-
-
-    input {
-      width: 100%;
-      padding: 12px;
-      margin-top: 6px;
-
-      font-size: 16px;
-
-      border-radius: 10px;
-      border: 1px solid var(--border);
-
-      box-sizing: border-box;
-      outline: none;
-      background: #fff;
-    }
-
-
-    input:focus {
-      border-color: rgba(11,94,215,.6);
-
-      box-shadow:
-        0 0 0 3px rgba(11,94,215,.15);
-    }
-
-
-    /* =========================
-       BUTTONS
-       ========================= */
-
-    .btn {
-      width: 100%;
-      margin-top: 12px;
-      padding: 12px;
-
-      font-size: 16px;
-      font-weight: 650;
-
-      border: none;
-      border-radius: 12px;
-
-      background: var(--primary);
-      color: white;
-
-      cursor: pointer;
-    }
-
-
-    .btn:active {
-      transform: translateY(1px);
-    }
-
-
-    .btn.secondary {
-      background: var(--secondary);
-    }
-
-
-    .btn.danger {
-      background: var(--danger);
-    }
-
-
-    /* =========================
-       STATUS
-       ========================= */
-
-    .status {
-      margin-top: 12px;
-      padding: 10px 12px;
-
-      background: #fff;
-
-      border-radius: 12px;
-      border: 1px solid #eef2f7;
-
-      font-size: 14px;
-      white-space: pre-wrap;
-      text-align: center;
-    }
-
-
-    .tiny {
-      margin-top: 6px;
-
-      color: var(--muted);
-
-      font-size: 12px;
-      line-height: 1.3;
-
-      text-align: center;
-    }
-
-
-    .linkwrap {
-      margin-top: 12px;
-      text-align: center;
-    }
-
-
-    a {
-      color: var(--primary);
-      text-decoration: underline;
-      font-size: 14px;
-    }
-
-
-    /* =========================
-       FULLSCREEN SCANNER
-       ========================= */
-
-    #scannerOverlay {
-      position: fixed;
-      inset: 0;
-
-      display: none;
-
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-
-      background: #000;
-
-      z-index: 9999;
-
+    body {
       padding:
         max(12px, env(safe-area-inset-top))
         max(12px, env(safe-area-inset-right))
         max(12px, env(safe-area-inset-bottom))
         max(12px, env(safe-area-inset-left));
-
-      box-sizing: border-box;
     }
 
-
-    /*
-      IMPORTANT:
-      There is no second custom aiming box here.
-
-      html5-qrcode draws the actual scan region itself.
-    */
-
-    #reader {
+    .container {
       width: 100%;
-      max-width: 460px;
+      max-width: 520px;
+      margin: 0 auto;
+    }
+
+    .view {
+      display: none;
+    }
+
+    .view.active {
+      display: block;
+    }
+
+    h1 {
+      margin: 6px 0 10px;
+      text-align: center;
+      font-size: 24px;
+    }
+
+    h2 {
+      margin: 4px 0 14px;
+      text-align: center;
+      font-size: 21px;
+    }
+
+    .subtitle {
+      margin-bottom: 20px;
+      color: var(--muted);
+      text-align: center;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: 14px;
+      padding: 14px;
+    }
+
+    button {
+      width: 100%;
+      margin-top: 10px;
+      padding: 13px;
+
+      border: none;
+      border-radius: 12px;
+
+      font-size: 16px;
+      font-weight: 700;
+
+      color: white;
+      background: var(--primary);
+
+      cursor: pointer;
+    }
+
+    button:active {
+      transform: translateY(1px);
+    }
+
+    button.secondary {
+      background: var(--secondary);
+    }
+
+    button.danger {
+      background: var(--danger);
+    }
+
+    button.large {
+      padding: 18px;
+      font-size: 18px;
+    }
+
+    label {
+      display: block;
+      margin-top: 10px;
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    input {
+      width: 100%;
+      margin-top: 6px;
+      padding: 13px;
+
+      border: 1px solid var(--border);
+      border-radius: 10px;
+
+      background: #ffffff;
+      color: #111827;
+
+      font-size: 18px;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: #60a5fa;
+    }
+
+    .status {
+      margin-top: 10px;
+      padding: 10px;
+
+      border-radius: 10px;
+
+      background: var(--card);
+
+      text-align: center;
+      font-size: 14px;
+    }
+
+    .status.warning {
+      background: #78350f;
+    }
+
+    .status.error {
+      background: #7f1d1d;
+    }
+
+    .status.success {
+      background: #166534;
+    }
+
+    /* =========================================
+       LANDING PAGE
+       ========================================= */
+
+    #landingView {
+      padding-top: 30px;
+    }
+
+    .landing-card {
+      padding: 18px;
+    }
+
+    /* =========================================
+       COUNTERS
+       ========================================= */
+
+    .counters {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .counter {
+      flex: 1;
+
+      background: var(--card);
+
+      border-radius: 12px;
+      padding: 10px;
+
+      text-align: center;
+    }
+
+    .counter-label {
+      color: var(--muted);
+
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+
+    .counter-number {
+      margin-top: 2px;
+
+      font-size: 30px;
+      font-weight: 800;
+
+      line-height: 1;
+    }
+
+    #savedCounter {
+      color: #86efac;
+    }
+
+    /* =========================================
+       SCAN CONFIRMATION
+       ========================================= */
+
+    #confirmation {
+      height: 68px;
+
+      margin-bottom: 10px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      background: var(--card);
+
+      border-radius: 12px;
+
+      font-size: 24px;
+      font-weight: 800;
+
+      text-align: center;
+
+      transition:
+        background-color .15s ease,
+        transform .15s ease;
+    }
+
+    #confirmation.success {
+      background: var(--success);
+      transform: scale(1.02);
+    }
+
+    /* =========================================
+       CAMERA
+       ========================================= */
+
+    #readerContainer {
+      position: relative;
+
+      width: 100%;
+
+      background: #000;
 
       border-radius: 14px;
       overflow: hidden;
     }
 
-
-    #scannerHint {
-      margin-top: 14px;
-
-      color: rgba(255,255,255,.9);
-
-      font-size: 14px;
-      line-height: 1.3;
-
-      text-align: center;
-
-      max-width: 460px;
+    #reader {
+      width: 100%;
     }
 
+    #scanFlash {
+      position: absolute;
+      inset: 0;
 
-    #closeScannerBtn {
+      display: none;
+
+      background:
+        rgba(22, 163, 74, .35);
+
+      pointer-events: none;
+
+      z-index: 100;
+    }
+
+    #scanFlash.show {
+      display: block;
+    }
+
+    /* =========================================
+       RECENT ENTRIES
+       ========================================= */
+
+    .recent {
+      margin-top: 10px;
+
+      background: var(--card);
+
+      border-radius: 12px;
+      padding: 10px;
+    }
+
+    .recent-title {
+      margin-bottom: 6px;
+
+      color: var(--muted);
+
+      font-size: 12px;
+      font-weight: 700;
+
+      text-align: center;
+      letter-spacing: .5px;
+    }
+
+    #recentList {
+      margin: 0;
+      padding: 0;
+
+      list-style: none;
+    }
+
+    #recentList li {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+
+      padding: 6px 4px;
+
+      border-top:
+        1px solid rgba(255, 255, 255, .08);
+
+      font-size: 14px;
+    }
+
+    .saved {
+      color: #86efac;
+    }
+
+    .waiting {
+      color: #fbbf24;
+    }
+
+    /* =========================================
+       MANUAL ENTRY
+       ========================================= */
+
+    .manual-wrap {
       margin-top: 16px;
-      max-width: 460px;
+    }
+
+    #manualConfirmation {
+      margin-top: 12px;
+      min-height: 48px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      border-radius: 10px;
+
+      background: #111827;
+
+      text-align: center;
+      font-weight: 700;
+    }
+
+    #manualConfirmation.success {
+      background: var(--success);
+    }
+
+    #manualQueueStatus {
+      margin-top: 10px;
+
+      color: var(--muted);
+
+      text-align: center;
+      font-size: 13px;
     }
 
   </style>
-
 </head>
 
 
 <body>
 
-
-  <!-- =========================
-       MAIN FORM
-       ========================= -->
-
-  <div class="app">
-
-    <div class="container">
+<div class="container">
 
 
-      <div class="header">
+  <!-- ==================================================
+       LANDING PAGE
+       ================================================== -->
 
-        <h1>ET143 A1 Sign in</h1>
+  <div
+    id="landingView"
+    class="view active"
+  >
 
-        <p>
-          Scan student number → surname auto-fills from class list → submit
-        </p>
+    <h1>ET143 A1 Sign in</h1>
 
-      </div>
-
-
-      <div class="card">
-
-
-        <form id="entryForm">
-
-
-          <!-- STUDENT NUMBER -->
-
-          <label for="studentNumber">
-            Student Number
-          </label>
+    <div class="subtitle">
+      Choose a sign-in method
+    </div>
 
 
-          <input
-            id="studentNumber"
-            placeholder="Scan or type student number"
-            required
-            type="text"
-            inputmode="numeric"
-            pattern="[0-9]*"
-            autocomplete="off"
-          >
+    <div class="card landing-card">
+
+      <button
+        class="large"
+        type="button"
+        onclick="goToScanner()"
+      >
+        Rapid Card Scanner
+      </button>
 
 
-          <!-- SCAN BUTTON -->
-
-          <button
-            class="btn secondary"
-            type="button"
-            onclick="openScanner()"
-          >
-            Scan Barcode
-          </button>
-
-
-          <div class="tiny">
-            Surname will auto-fill if found (still editable).
-          </div>
-
-
-          <!-- SURNAME -->
-
-          <label for="surname">
-            Surname
-          </label>
-
-
-          <input
-            id="surname"
-            required
-            type="text"
-            autocomplete="off"
-          >
-
-
-          <!-- SUBMIT -->
-
-          <button
-            class="btn"
-            type="submit"
-          >
-            Submit
-          </button>
-
-
-        </form>
-
-
-        <!-- STATUS -->
-
-        <div
-          id="status"
-          class="status"
-        >
-          Ready
-        </div>
-
-
-        <!-- NEW SUBMISSION -->
-
-        <div class="linkwrap">
-
-          <a
-            href="#"
-            onclick="newSubmission(); return false;"
-          >
-            New submission
-          </a>
-
-        </div>
-
-
-        <div class="tiny">
-          If scanning is slow, move the phone slightly closer or farther
-          until the barcode snaps into focus.
-        </div>
-
-
-      </div>
+      <button
+        class="large secondary"
+        type="button"
+        onclick="goToManual()"
+      >
+        Manual Entry
+      </button>
 
     </div>
 
@@ -421,730 +442,1561 @@
 
 
 
-  <!-- =========================
-       FULLSCREEN SCANNER
-       ========================= -->
+  <!-- ==================================================
+       RAPID SCANNER
+       ================================================== -->
 
-  <div id="scannerOverlay">
+  <div
+    id="scannerView"
+    class="view"
+  >
+
+    <h2>Rapid Card Scanner</h2>
 
 
-    <div id="reader"></div>
+    <!-- COUNTERS -->
+
+    <div class="counters">
+
+      <div class="counter">
+
+        <div class="counter-label">
+          SCANNED
+        </div>
+
+        <div
+          id="scannedCounter"
+          class="counter-number"
+        >
+          0
+        </div>
+
+      </div>
 
 
-    <div id="scannerHint">
-      Align the barcode inside the clear scanning box.
-      Hold the phone steady for a moment.
+      <div class="counter">
+
+        <div class="counter-label">
+          SAVED
+        </div>
+
+        <div
+          id="savedCounter"
+          class="counter-number"
+        >
+          0
+        </div>
+
+      </div>
+
     </div>
 
 
-    <button
-      id="closeScannerBtn"
-      class="btn danger"
-      type="button"
-      onclick="closeScanner()"
+    <!-- LARGE CONFIRMATION -->
+
+    <div id="confirmation">
+      Ready
+    </div>
+
+
+    <!-- CAMERA -->
+
+    <div id="readerContainer">
+
+      <div id="reader"></div>
+
+      <div id="scanFlash"></div>
+
+    </div>
+
+
+    <!-- UPLOAD STATUS -->
+
+    <div
+      id="queueStatus"
+      class="status"
     >
-      Cancel
+      Ready
+    </div>
+
+
+    <!-- SCANNER CONTROLS -->
+
+    <button
+      id="startButton"
+      type="button"
+      onclick="startScanner()"
+    >
+      Start Scanner
     </button>
 
 
+    <button
+      id="stopButton"
+      class="secondary"
+      type="button"
+      style="display:none"
+      onclick="stopScanner()"
+    >
+      Stop Scanner
+    </button>
+
+
+    <button
+      class="secondary"
+      type="button"
+      onclick="goToManual()"
+    >
+      Manual Entry
+    </button>
+
+
+    <button
+      class="secondary"
+      type="button"
+      onclick="goHome()"
+    >
+      Back to Home
+    </button>
+
+
+    <!-- RECENT ENTRIES -->
+
+    <div class="recent">
+
+      <div class="recent-title">
+        RECENT ENTRIES
+      </div>
+
+      <ul id="recentList"></ul>
+
+    </div>
+
   </div>
 
 
 
-  <script>
+  <!-- ==================================================
+       MANUAL ENTRY
+       ================================================== -->
 
-    // ==================================================
-    // CONFIG
-    // ==================================================
+  <div
+    id="manualView"
+    class="view"
+  >
+
+    <h2>Manual Entry</h2>
+
+
+    <div class="card manual-wrap">
+
+      <label for="manualStudentNumber">
+        Student Number
+      </label>
+
+
+      <input
+        id="manualStudentNumber"
+        type="text"
+        inputmode="numeric"
+        pattern="[0-9]*"
+        autocomplete="off"
+        placeholder="Enter student number"
+      >
+
+
+      <button
+        type="button"
+        onclick="saveManualEntry()"
+      >
+        Save Student
+      </button>
+
+
+      <button
+        class="secondary"
+        type="button"
+        onclick="goToScanner()"
+      >
+        Rapid Card Scanner
+      </button>
+
+
+      <button
+        class="secondary"
+        type="button"
+        onclick="goHome()"
+      >
+        Back to Home
+      </button>
+
+
+      <div id="manualConfirmation">
+        Ready
+      </div>
+
+
+      <div id="manualQueueStatus">
+      </div>
+
+    </div>
+
+  </div>
+
+
+</div>
+
+
+
+<script>
+
+  // ==================================================
+  // CONFIGURATION
+  // ==================================================
+
+  /*
+    Replace this with your Apps Script
+    Web App URL ending in /exec
+  */
+
+  const API_URL =
+    "https://script.google.com/macros/s/AKfycbzQJvyy7VfBTqBIsw0u7bejiVkoT6b_DYmGlt1MrjYWnm_jYOO6USjTCl1K6Gm0E5c9WA/exec";
+
+
+  /*
+    Same-card lockout.
+
+    The SAME barcode will be ignored for
+    2 seconds after being accepted.
+
+    A DIFFERENT barcode can be accepted
+    immediately.
+  */
+
+  const DUPLICATE_LOCK_MS =
+    2000;
+
+
+  /*
+    Maximum number of queued entries sent
+    to Apps Script in one request.
+  */
+
+  const BATCH_SIZE =
+    10;
+
+
+  /*
+    If entries remain unsaved, retry every
+    2 seconds.
+  */
+
+  const RETRY_INTERVAL_MS =
+    2000;
+
+
+
+  // ==================================================
+  // PAGE ELEMENTS
+  // ==================================================
+
+  const landingView =
+    document.getElementById(
+      "landingView"
+    );
+
+  const scannerView =
+    document.getElementById(
+      "scannerView"
+    );
+
+  const manualView =
+    document.getElementById(
+      "manualView"
+    );
+
+
+  const scannedCounterEl =
+    document.getElementById(
+      "scannedCounter"
+    );
+
+  const savedCounterEl =
+    document.getElementById(
+      "savedCounter"
+    );
+
+  const confirmationEl =
+    document.getElementById(
+      "confirmation"
+    );
+
+  const queueStatusEl =
+    document.getElementById(
+      "queueStatus"
+    );
+
+  const recentListEl =
+    document.getElementById(
+      "recentList"
+    );
+
+  const scanFlashEl =
+    document.getElementById(
+      "scanFlash"
+    );
+
+  const startButton =
+    document.getElementById(
+      "startButton"
+    );
+
+  const stopButton =
+    document.getElementById(
+      "stopButton"
+    );
+
+  const manualStudentNumber =
+    document.getElementById(
+      "manualStudentNumber"
+    );
+
+  const manualConfirmation =
+    document.getElementById(
+      "manualConfirmation"
+    );
+
+  const manualQueueStatus =
+    document.getElementById(
+      "manualQueueStatus"
+    );
+
+
+
+  // ==================================================
+  // STATE
+  // ==================================================
+
+  let scanner = null;
+
+  let uploadInProgress =
+    false;
+
+  let recentBarcodes =
+    {};
+
+  let audioContext =
+    null;
+
+
+  /*
+    Session counters.
+
+    These count entries accepted during
+    this page session.
+  */
+
+  let scannedCount =
+    0;
+
+  let savedCount =
+    0;
+
+
+
+  // ==================================================
+  // LOAD UNSAVED QUEUE
+  // ==================================================
+
+  let uploadQueue = [];
+
+
+  try {
+
+    uploadQueue =
+      JSON.parse(
+        localStorage.getItem(
+          "ET143_uploadQueue"
+        )
+      ) || [];
+
+  }
+
+  catch (error) {
+
+    uploadQueue = [];
+
+  }
+
+
+
+  // ==================================================
+  // LOCAL QUEUE STORAGE
+  // ==================================================
+
+  function saveQueueLocally() {
+
+    try {
+
+      localStorage.setItem(
+        "ET143_uploadQueue",
+        JSON.stringify(
+          uploadQueue
+        )
+      );
+
+    }
+
+    catch (error) {
+
+      console.error(
+        "Could not save local queue:",
+        error
+      );
+
+    }
+
+  }
+
+
+
+  // ==================================================
+  // PAGE NAVIGATION
+  // ==================================================
+
+  function showView(view) {
+
+    landingView.classList.remove(
+      "active"
+    );
+
+    scannerView.classList.remove(
+      "active"
+    );
+
+    manualView.classList.remove(
+      "active"
+    );
+
+
+    view.classList.add(
+      "active"
+    );
+
+  }
+
+
+
+  async function goHome() {
+
+    await stopScanner();
+
+    showView(
+      landingView
+    );
+
+  }
+
+
+
+  async function goToManual() {
 
     /*
-      Replace this with the Web App URL from
-      Google Apps Script.
-
-      It must end in /exec
+      Stop the camera while manually
+      entering a student number.
     */
 
-    const API_URL =  "https://script.google.com/macros/s/AKfycby5HkkPSt4bgz4qMiVZX8Krs6_RPyeUcDjzEFJafYH2c8XxIv5PRQrA4EX2hZJ9FKhvuA/exec";
+    await stopScanner();
+
+
+    showView(
+      manualView
+    );
+
+
+    manualConfirmation.textContent =
+      "Ready";
+
+    manualConfirmation.className =
+      "";
+
+
+    updateManualQueueStatus();
+
+
+    setTimeout(
+      () => {
+
+        manualStudentNumber.focus();
+
+      },
+      100
+    );
+
+  }
 
 
 
-    // ==================================================
-    // ELEMENTS
-    // ==================================================
+  async function goToScanner() {
 
-    const formEl =
-      document.getElementById("entryForm");
+    showView(
+      scannerView
+    );
 
-    const statusEl =
-      document.getElementById("status");
 
-    const studentInput =
-      document.getElementById("studentNumber");
+    /*
+      Because this function originates from
+      a button press, browsers should allow
+      camera access here.
+    */
 
-    const surnameInput =
-      document.getElementById("surname");
+    await startScanner();
 
-    const overlay =
-      document.getElementById("scannerOverlay");
+  }
 
 
 
-    // ==================================================
-    // STATE
-    // ==================================================
+  // ==================================================
+  // COUNTERS
+  // ==================================================
 
-    let scanner = null;
+  function updateCounters() {
 
-    let lastLookupStudent = "";
-
-    let lookupTimer = null;
-
-    let surnameWasAutoFilled = false;
+    scannedCounterEl.textContent =
+      scannedCount;
 
 
+    savedCounterEl.textContent =
+      savedCount;
 
-    // ==================================================
-    // STATUS
-    // ==================================================
+  }
 
-    function setStatus(message) {
 
-      statusEl.innerText = message;
+
+  // ==================================================
+  // QUEUE STATUS
+  // ==================================================
+
+  function updateQueueStatus() {
+
+    const waiting =
+      uploadQueue.length;
+
+
+    queueStatusEl.className =
+      "status";
+
+
+    if (waiting === 0) {
+
+      queueStatusEl.textContent =
+        "All entries saved ✔";
+
+    }
+
+    else {
+
+      queueStatusEl.textContent =
+        waiting +
+        (
+          waiting === 1
+            ? " entry waiting to upload"
+            : " entries waiting to upload"
+        );
+
+
+      queueStatusEl.classList.add(
+        "warning"
+      );
 
     }
 
 
+    updateManualQueueStatus();
 
-    // ==================================================
-    // SURNAME LOOKUP
-    // ==================================================
-
-    async function lookupSurname(studentNumber) {
-
-      const sn =
-        String(studentNumber || "").trim();
+  }
 
 
-      if (!sn) {
-        return;
-      }
+
+  function updateManualQueueStatus() {
+
+    const waiting =
+      uploadQueue.length;
 
 
-      if (sn === lastLookupStudent) {
-        return;
-      }
+    if (waiting === 0) {
+
+      manualQueueStatus.textContent =
+        "All entries saved ✔";
+
+    }
+
+    else {
+
+      manualQueueStatus.textContent =
+        waiting +
+        (
+          waiting === 1
+            ? " entry waiting to upload"
+            : " entries waiting to upload"
+        );
+
+    }
+
+  }
 
 
-      lastLookupStudent = sn;
+
+  // ==================================================
+  // BARCODE SCAN BOX
+  // ==================================================
+
+  function computeScanBox(
+    viewfinderWidth,
+    viewfinderHeight
+  ) {
+
+    const width =
+      Math.min(
+        420,
+        Math.floor(
+          viewfinderWidth * 0.90
+        )
+      );
 
 
-      setStatus("Looking up surname…");
+    const height =
+      Math.max(
+        55,
+        Math.floor(
+          width / 5.2
+        )
+      );
 
 
-      try {
+    return {
+      width: width,
+      height: height
+    };
 
-        const response =
-          await fetch(
-            API_URL,
-            {
-              method: "POST",
+  }
 
-              body: JSON.stringify({
-                action: "lookup",
-                studentNumber: sn
-              })
+
+
+  // ==================================================
+  // START SCANNER
+  // ==================================================
+
+  async function startScanner() {
+
+    if (scanner) {
+      return;
+    }
+
+
+    confirmationEl.textContent =
+      "Starting camera…";
+
+
+    const newScanner =
+      new Html5Qrcode(
+        "reader"
+      );
+
+
+    scanner =
+      newScanner;
+
+
+    try {
+
+      await newScanner.start(
+
+        {
+          facingMode:
+            "environment"
+        },
+
+        {
+
+          fps: 20,
+
+          qrbox:
+            computeScanBox,
+
+          videoConstraints: {
+
+            facingMode:
+              "environment",
+
+            width: {
+              ideal: 1280
+            },
+
+            height: {
+              ideal: 720
             }
-          );
 
+          },
 
-        const data =
-          await response.json();
+          experimentalFeatures: {
 
-
-
-        // Student found
-
-        if (
-          data &&
-          data.ok &&
-          data.found &&
-          data.surname
-        ) {
-
-          const currentSurname =
-            surnameInput.value.trim();
-
-
-          if (
-            !currentSurname ||
-            surnameWasAutoFilled
-          ) {
-
-            surnameInput.value =
-              data.surname;
-
-            surnameWasAutoFilled =
-              true;
+            useBarCodeDetectorIfSupported:
+              true
 
           }
 
+        },
 
-          setStatus(
-            "Surname found ✔ (editable)"
-          );
+        onScanSuccess
 
-        }
-
-
-        // Student number not found
-
-        else if (
-          data &&
-          data.ok
-        ) {
-
-          surnameWasAutoFilled =
-            false;
-
-
-          setStatus(
-            "Surname not found — type it manually."
-          );
-
-        }
-
-
-        // Server returned error
-
-        else {
-
-          surnameWasAutoFilled =
-            false;
-
-
-          setStatus(
-            "Lookup failed — type surname manually."
-          );
-
-        }
-
-      }
-
-
-      catch (error) {
-
-        console.error(error);
-
-
-        surnameWasAutoFilled =
-          false;
-
-
-        setStatus(
-          "Lookup failed — type surname manually."
-        );
-
-      }
-
-    }
-
-
-
-    // ==================================================
-    // LOOKUP WHEN STUDENT NUMBER IS TYPED
-    // ==================================================
-
-    function scheduleLookup() {
-
-      clearTimeout(lookupTimer);
-
-
-      lookupTimer =
-        setTimeout(
-          () => {
-
-            lookupSurname(
-              studentInput.value
-            );
-
-          },
-          300
-        );
-
-    }
-
-
-
-    studentInput.addEventListener(
-      "input",
-      () => {
-
-        surnameWasAutoFilled =
-          false;
-
-        /*
-          Reset this so changing a manually entered
-          student number triggers a new lookup.
-        */
-
-        lastLookupStudent = "";
-
-        scheduleLookup();
-
-      }
-    );
-
-
-
-    studentInput.addEventListener(
-      "blur",
-      () => {
-
-        lookupSurname(
-          studentInput.value
-        );
-
-      }
-    );
-
-
-
-    // ==================================================
-    // SCAN BOX
-    // ==================================================
-
-    /*
-      The student-card barcode is approximately
-      42 mm wide × 6 mm high.
-
-      This gives html5-qrcode a wide, short
-      detection area.
-
-      The function receives the ACTUAL camera
-      view dimensions from html5-qrcode.
-
-      This is important because it keeps the
-      visible clear box aligned with the
-      detection region.
-    */
-
-    function computeScanBox(
-      viewfinderWidth,
-      viewfinderHeight
-    ) {
-
-      /*
-        Use up to about 90% of the actual
-        camera width, with a maximum of 420 px.
-      */
-
-      const width =
-        Math.min(
-          420,
-          Math.floor(
-            viewfinderWidth * 0.90
-          )
-        );
-
-
-      /*
-        Keep the reader box wide and short.
-      */
-
-      const height =
-        Math.max(
-          55,
-          Math.floor(
-            width / 5.2
-          )
-        );
-
-
-      return {
-        width: width,
-        height: height
-      };
-
-    }
-
-
-
-    // ==================================================
-    // OPEN SCANNER
-    // ==================================================
-
-    function openScanner() {
-
-      overlay.style.display =
-        "flex";
-
-
-      /*
-        Starting on the next animation frame gives
-        the browser time to display the overlay
-        before html5-qrcode measures its dimensions.
-      */
-
-      requestAnimationFrame(
-        () => {
-
-          startScanner();
-
-        }
-      );
-
-    }
-
-
-
-    // ==================================================
-    // START SCANNER
-    // ==================================================
-
-    async function startScanner() {
-
-      if (scanner) {
-        return;
-      }
-
-
-      const reader =
-        document.getElementById("reader");
-
-
-      reader.innerHTML = "";
-
-
-      scanner =
-        new Html5Qrcode("reader");
-
-
-      try {
-
-        await scanner.start(
-
-          // Prefer rear camera
-          {
-            facingMode: "environment"
-          },
-
-
-          // Scanner configuration
-          {
-
-            fps: 15,
-
-
-            /*
-              html5-qrcode calculates this against
-              the actual camera view.
-
-              This is the ONLY reader box.
-            */
-
-            qrbox: computeScanBox,
-
-
-            /*
-              Request decent resolution.
-
-              720p gave good results with the
-              narrow student-card barcode.
-            */
-
-            videoConstraints: {
-
-              facingMode:
-                "environment",
-
-              width: {
-                ideal: 1280
-              },
-
-              height: {
-                ideal: 720
-              }
-
-            },
-
-
-            experimentalFeatures: {
-
-              useBarCodeDetectorIfSupported:
-                true
-
-            }
-
-          },
-
-
-          // Successful scan
-          onScanSuccess
-
-        );
-
-      }
-
-
-      catch (error) {
-
-        console.error(error);
-
-
-        setStatus(
-          "Camera start failed: " +
-          (
-            error?.message ||
-            error
-          )
-        );
-
-
-        await closeScanner();
-
-      }
-
-    }
-
-
-
-    // ==================================================
-    // SUCCESSFUL BARCODE SCAN
-    // ==================================================
-
-    async function onScanSuccess(
-      decodedText
-    ) {
-
-      /*
-        Ignore another result while we're already
-        shutting down the scanner.
-      */
-
-      if (!scanner) {
-        return;
-      }
-
-
-      const studentNumber =
-        String(decodedText || "").trim();
-
-
-      if (!studentNumber) {
-        return;
-      }
-
-
-      /*
-        Put scanned number into form.
-      */
-
-      studentInput.value =
-        studentNumber;
-
-
-      /*
-        Force lookup even if this number happened
-        to be looked up previously.
-      */
-
-      lastLookupStudent = "";
-
-
-      /*
-        Close camera first.
-      */
-
-      await closeScanner();
-
-
-      setStatus(
-        "Student number scanned ✔\nLooking up surname…"
       );
 
 
       /*
-        Look up surname automatically.
+        Make sure this scanner wasn't stopped
+        while it was starting.
       */
 
-      await lookupSurname(
-        studentNumber
-      );
-
-
-      /*
-        Move cursor to surname so it can still
-        be corrected manually if necessary.
-      */
-
-      surnameInput.focus();
-
-    }
-
-
-
-    // ==================================================
-    // CLOSE SCANNER
-    // ==================================================
-
-    async function closeScanner() {
-
-      if (scanner) {
-
-        const activeScanner =
-          scanner;
-
-
-        /*
-          Set this to null immediately so another
-          successful scan cannot fire while the
-          camera is closing.
-        */
-
-        scanner = null;
-
+      if (
+        scanner !== newScanner
+      ) {
 
         try {
-
-          await activeScanner.stop();
-
-        }
-
-        catch (error) {
-
-          console.log(
-            "Scanner already stopped."
-          );
-
-        }
-
+          await newScanner.stop();
+        } catch (error) {}
 
         try {
+          newScanner.clear();
+        } catch (error) {}
 
-          activeScanner.clear();
-
-        }
-
-        catch (error) {
-
-          // Nothing further required.
-
-        }
+        return;
 
       }
 
 
-      overlay.style.display =
+      confirmationEl.textContent =
+        "Ready to scan";
+
+
+      startButton.style.display =
+        "none";
+
+
+      stopButton.style.display =
+        "block";
+
+
+      updateQueueStatus();
+
+    }
+
+    catch (error) {
+
+      console.error(
+        "Camera error:",
+        error
+      );
+
+
+      if (
+        scanner === newScanner
+      ) {
+
+        scanner =
+          null;
+
+      }
+
+
+      confirmationEl.textContent =
+        "Camera failed";
+
+
+      queueStatusEl.textContent =
+        "Could not start camera";
+
+
+      queueStatusEl.className =
+        "status error";
+
+
+      startButton.style.display =
+        "block";
+
+
+      stopButton.style.display =
         "none";
 
     }
 
+  }
 
 
-    // ==================================================
-    // NEW SUBMISSION
-    // ==================================================
 
-    async function newSubmission() {
+  // ==================================================
+  // STOP SCANNER
+  // ==================================================
 
-      await closeScanner();
+  async function stopScanner() {
 
-
-      studentInput.value = "";
-
-      surnameInput.value = "";
+    if (!scanner) {
+      return;
+    }
 
 
-      lastLookupStudent = "";
-
-      surnameWasAutoFilled =
-        false;
+    const activeScanner =
+      scanner;
 
 
-      setStatus("Ready");
+    scanner =
+      null;
 
 
-      studentInput.focus();
+    try {
+
+      await activeScanner.stop();
+
+    }
+
+    catch (error) {
+
+      console.log(
+        "Scanner already stopped."
+      );
+
+    }
+
+
+    try {
+
+      activeScanner.clear();
+
+    }
+
+    catch (error) {}
+
+
+    startButton.style.display =
+      "block";
+
+
+    stopButton.style.display =
+      "none";
+
+
+    confirmationEl.textContent =
+      "Scanner stopped";
+
+  }
+
+
+
+  // ==================================================
+  // SUCCESSFUL BARCODE READ
+  // ==================================================
+
+  function onScanSuccess(
+    decodedText
+  ) {
+
+    const barcode =
+      String(
+        decodedText || ""
+      ).trim();
+
+
+    if (!barcode) {
+      return;
+    }
+
+
+    const now =
+      Date.now();
+
+
+
+    /*
+      ==================================================
+      TWO-SECOND SAME-CARD LOCKOUT
+
+      This ONLY blocks the same barcode.
+
+      A different card can be scanned immediately.
+      ==================================================
+    */
+
+    if (
+      recentBarcodes[barcode] &&
+      now -
+      recentBarcodes[barcode]
+      < DUPLICATE_LOCK_MS
+    ) {
+
+      return;
+
+    }
+
+
+    recentBarcodes[barcode] =
+      now;
+
+
+
+    /*
+      Remove old entries from the duplicate
+      tracking object.
+    */
+
+    for (
+      const code in recentBarcodes
+    ) {
+
+      if (
+        now -
+        recentBarcodes[code]
+        > 10000
+      ) {
+
+        delete recentBarcodes[
+          code
+        ];
+
+      }
 
     }
 
 
 
-    // ==================================================
-    // SUBMIT FORM
-    // ==================================================
+    /*
+      Accept immediately.
 
-    formEl.addEventListener(
-      "submit",
+      We do NOT wait for Google Sheets.
+    */
 
-      async (event) => {
+    acceptEntry(
+      barcode,
+      "Barcode"
+    );
+
+
+    showSuccessfulScan(
+      barcode
+    );
+
+  }
+
+
+
+  // ==================================================
+  // ACCEPT ENTRY
+  // ==================================================
+
+  /*
+    Barcode scans and manual entries both
+    enter the same queue here.
+  */
+
+  function acceptEntry(
+    studentNumber,
+    method
+  ) {
+
+    const entry = {
+
+      studentNumber:
+        String(
+          studentNumber
+        ).trim(),
+
+      method:
+        method
+
+    };
+
+
+    if (
+      !entry.studentNumber
+    ) {
+
+      return;
+
+    }
+
+
+    uploadQueue.push(
+      entry
+    );
+
+
+    scannedCount++;
+
+
+    saveQueueLocally();
+
+
+    updateCounters();
+
+
+    addRecentEntry(
+      entry
+    );
+
+
+    updateQueueStatus();
+
+
+
+    /*
+      Start background upload immediately.
+
+      This does not block the scanner.
+    */
+
+    processUploadQueue();
+
+  }
+
+
+
+  // ==================================================
+  // MANUAL ENTRY
+  // ==================================================
+
+  function saveManualEntry() {
+
+    const studentNumber =
+      manualStudentNumber.value
+        .trim();
+
+
+    if (!studentNumber) {
+
+      manualConfirmation.textContent =
+        "Enter a student number";
+
+      return;
+
+    }
+
+
+
+    /*
+      Require numeric characters for manual
+      student numbers.
+    */
+
+    if (
+      !/^[0-9]+$/.test(
+        studentNumber
+      )
+    ) {
+
+      manualConfirmation.textContent =
+        "Student number must contain numbers only";
+
+      return;
+
+    }
+
+
+
+    acceptEntry(
+      studentNumber,
+      "Manual"
+    );
+
+
+    manualConfirmation.textContent =
+      "✓ " +
+      studentNumber;
+
+
+    manualConfirmation.className =
+      "success";
+
+
+    manualStudentNumber.value =
+      "";
+
+
+    playBeep();
+
+
+    if (
+      navigator.vibrate
+    ) {
+
+      navigator.vibrate(
+        80
+      );
+
+    }
+
+
+
+    setTimeout(
+      () => {
+
+        manualConfirmation.textContent =
+          "Ready";
+
+
+        manualConfirmation.className =
+          "";
+
+
+        manualStudentNumber.focus();
+
+      },
+      700
+    );
+
+  }
+
+
+
+  /*
+    Pressing Enter on the phone keyboard
+    saves the manual entry.
+  */
+
+  manualStudentNumber.addEventListener(
+    "keydown",
+    function(event) {
+
+      if (
+        event.key === "Enter"
+      ) {
 
         event.preventDefault();
 
+        saveManualEntry();
+
+      }
+
+    }
+  );
+
+
+
+  // ==================================================
+  // SCAN CONFIRMATION
+  // ==================================================
+
+  function showSuccessfulScan(
+    barcode
+  ) {
+
+    /*
+      LARGE GREEN CONFIRMATION
+    */
+
+    confirmationEl.textContent =
+      "✓ " + barcode;
+
+
+    confirmationEl.classList.add(
+      "success"
+    );
+
+
+
+    /*
+      GREEN CAMERA FLASH
+    */
+
+    scanFlashEl.classList.add(
+      "show"
+    );
+
+
+    setTimeout(
+      () => {
+
+        scanFlashEl.classList.remove(
+          "show"
+        );
+
+      },
+      160
+    );
+
+
+
+    /*
+      Return confirmation box to Ready.
+    */
+
+    setTimeout(
+      () => {
+
+        confirmationEl.classList.remove(
+          "success"
+        );
+
+
+        confirmationEl.textContent =
+          "Ready to scan";
+
+      },
+      600
+    );
+
+
+
+    /*
+      VIBRATION
+    */
+
+    if (
+      navigator.vibrate
+    ) {
+
+      navigator.vibrate(
+        80
+      );
+
+    }
+
+
+
+    /*
+      BEEP
+    */
+
+    playBeep();
+
+  }
+
+
+
+  // ==================================================
+  // BEEP
+  // ==================================================
+
+  function playBeep() {
+
+    try {
+
+      if (!audioContext) {
+
+        audioContext =
+          new (
+            window.AudioContext ||
+            window.webkitAudioContext
+          )();
+
+      }
+
+
+
+      /*
+        Some mobile browsers suspend the
+        audio context until user interaction.
+      */
+
+      if (
+        audioContext.state ===
+        "suspended"
+      ) {
+
+        audioContext.resume();
+
+      }
+
+
+      const oscillator =
+        audioContext
+          .createOscillator();
+
+
+      const gain =
+        audioContext
+          .createGain();
+
+
+      oscillator.connect(
+        gain
+      );
+
+
+      gain.connect(
+        audioContext.destination
+      );
+
+
+      oscillator.frequency.value =
+        1100;
+
+
+      gain.gain.value =
+        0.15;
+
+
+      oscillator.start();
+
+
+      oscillator.stop(
+        audioContext.currentTime +
+        0.09
+      );
+
+    }
+
+    catch (error) {
+
+      console.log(
+        "Audio unavailable."
+      );
+
+    }
+
+  }
+
+
+
+  // ==================================================
+  // RECENT ENTRIES
+  // ==================================================
+
+  function addRecentEntry(
+    entry
+  ) {
+
+    const li =
+      document.createElement(
+        "li"
+      );
+
+
+    /*
+      Give this visible list item a temporary
+      local identifier.
+
+      This is NOT sent to Google Sheets.
+    */
+
+    const localId =
+      "entry-" +
+      Date.now() +
+      "-" +
+      Math.random()
+        .toString(36)
+        .slice(2);
+
+
+    entry.localId =
+      localId;
+
+
+    li.id =
+      localId;
+
+
+    li.innerHTML =
+      "<span>" +
+      escapeHtml(
+        entry.studentNumber
+      ) +
+      "</span>" +
+
+      "<span class='waiting'>" +
+      escapeHtml(
+        entry.method
+      ) +
+      " · waiting" +
+      "</span>";
+
+
+    recentListEl.prepend(
+      li
+    );
+
+
+
+    /*
+      Keep the last 8 visible entries.
+    */
+
+    while (
+      recentListEl.children.length
+      > 8
+    ) {
+
+      recentListEl.removeChild(
+        recentListEl.lastChild
+      );
+
+    }
+
+
+    /*
+      Save localId into localStorage as well.
+    */
+
+    saveQueueLocally();
+
+  }
+
+
+
+  // ==================================================
+  // MARK ENTRY SAVED
+  // ==================================================
+
+  function markEntrySaved(
+    entry
+  ) {
+
+    if (!entry.localId) {
+      return;
+    }
+
+
+    const li =
+      document.getElementById(
+        entry.localId
+      );
+
+
+    if (!li) {
+      return;
+    }
+
+
+    const status =
+      li.querySelector(
+        "span:last-child"
+      );
+
+
+    if (status) {
+
+      status.textContent =
+        entry.method +
+        " · saved ✔";
+
+
+      status.className =
+        "saved";
+
+    }
+
+  }
+
+
+
+  // ==================================================
+  // BACKGROUND BATCH UPLOAD
+  // ==================================================
+
+  async function processUploadQueue() {
+
+    /*
+      Don't start another uploader if one
+      is already running.
+    */
+
+    if (
+      uploadInProgress
+    ) {
+
+      return;
+
+    }
+
+
+    if (
+      uploadQueue.length === 0
+    ) {
+
+      updateQueueStatus();
+
+      return;
+
+    }
+
+
+    uploadInProgress =
+      true;
+
+
+    try {
+
+      /*
+        Keep sending batches until the queue
+        is empty or a network/server error occurs.
+      */
+
+      while (
+        uploadQueue.length > 0
+      ) {
 
         /*
-          Browser validation.
+          Take up to BATCH_SIZE entries.
+
+          Do NOT remove them from the real queue
+          until Google confirms success.
         */
 
-        if (!formEl.checkValidity()) {
-
-          formEl.reportValidity();
-
-          return;
-
-        }
+        const batch =
+          uploadQueue.slice(
+            0,
+            BATCH_SIZE
+          );
 
 
-        const studentNumber =
-          studentInput.value.trim();
+        const payloadEntries =
+          batch.map(
+            entry => ({
+              studentNumber:
+                entry.studentNumber,
 
-
-        const surname =
-          surnameInput.value.trim();
-
-
-
-        const payload = {
-
-          action: "submit",
-
-          studentNumber:
-            studentNumber,
-
-          surname:
-            surname
-
-        };
-
-
-        setStatus("Saving…");
+              method:
+                entry.method
+            })
+          );
 
 
         try {
 
           const response =
             await fetch(
+
               API_URL,
+
               {
-                method: "POST",
+
+                method:
+                  "POST",
 
                 /*
                   Deliberately do NOT add:
 
                   Content-Type: application/json
 
-                  Apps Script works more reliably
-                  cross-origin from GitHub Pages
-                  when the JSON is sent as the
-                  plain request body.
+                  Keeping this as a simple POST
+                  works better with the Apps
+                  Script Web App cross-origin
+                  setup.
                 */
 
                 body:
-                  JSON.stringify(
-                    payload
-                  )
+                  JSON.stringify({
+
+                    action:
+                      "batchSubmit",
+
+                    entries:
+                      payloadEntries
+
+                  })
+
               }
+
             );
+
 
 
           const data =
@@ -1153,71 +2005,229 @@
 
 
           if (
-            data &&
-            data.ok
+            !data ||
+            !data.ok
           ) {
 
-            /*
-              Clear the fields first.
-            */
-
-            studentInput.value = "";
-
-            surnameInput.value = "";
-
-            lastLookupStudent = "";
-
-            surnameWasAutoFilled =
-              false;
-
-
-            /*
-              Leave confirmation visible instead
-              of immediately replacing it with
-              "Ready".
-            */
-
-            setStatus("Saved ✔");
-
-
-            studentInput.focus();
-
-          }
-
-
-          else {
-
-            setStatus(
-              "Save failed: " +
-              (
-                data?.error ||
-                "Unknown error"
-              )
+            throw new Error(
+              data?.error ||
+              "Server rejected batch"
             );
 
           }
 
-        }
 
+
+          /*
+            Apps Script tells us how many
+            records it wrote.
+          */
+
+          const numberSaved =
+            Number(
+              data.saved || 0
+            );
+
+
+          if (
+            numberSaved !==
+            batch.length
+          ) {
+
+            throw new Error(
+              "Server did not confirm full batch"
+            );
+
+          }
+
+
+
+          /*
+            Mark visible recent entries saved.
+          */
+
+          for (
+            const entry of batch
+          ) {
+
+            markEntrySaved(
+              entry
+            );
+
+          }
+
+
+
+          /*
+            NOW remove the confirmed batch
+            from the queue.
+          */
+
+          uploadQueue.splice(
+            0,
+            batch.length
+          );
+
+
+          savedCount +=
+            batch.length;
+
+
+          saveQueueLocally();
+
+
+          updateCounters();
+
+
+          updateQueueStatus();
+
+        }
 
         catch (error) {
 
-          console.error(error);
-
-
-          setStatus(
-            "Save failed. Check network / API URL."
+          console.error(
+            "Batch upload failed:",
+            error
           );
+
+
+          queueStatusEl.textContent =
+            "⚠ " +
+            uploadQueue.length +
+            " NOT SAVED — retrying";
+
+
+          queueStatusEl.className =
+            "status error";
+
+
+          updateManualQueueStatus();
+
+
+
+          /*
+            Leave everything in the queue.
+
+            The automatic retry timer will
+            try again shortly.
+          */
+
+          break;
 
         }
 
       }
 
-    );
+    }
+
+    finally {
+
+      uploadInProgress =
+        false;
+
+    }
+
+  }
 
 
-  </script>
 
+  // ==================================================
+  // AUTOMATIC RETRY
+  // ==================================================
+
+  setInterval(
+    () => {
+
+      if (
+        uploadQueue.length > 0
+      ) {
+
+        processUploadQueue();
+
+      }
+
+    },
+    RETRY_INTERVAL_MS
+  );
+
+
+
+  // ==================================================
+  // HTML ESCAPING
+  // ==================================================
+
+  function escapeHtml(
+    value
+  ) {
+
+    return String(value)
+
+      .replaceAll(
+        "&",
+        "&amp;"
+      )
+
+      .replaceAll(
+        "<",
+        "&lt;"
+      )
+
+      .replaceAll(
+        ">",
+        "&gt;"
+      )
+
+      .replaceAll(
+        '"',
+        "&quot;"
+      )
+
+      .replaceAll(
+        "'",
+        "&#039;"
+      );
+
+  }
+
+
+
+  // ==================================================
+  // INITIALISE
+  // ==================================================
+
+  updateCounters();
+
+  updateQueueStatus();
+
+
+
+  /*
+    If the browser was refreshed while entries
+    were waiting, recover them and try again.
+  */
+
+  if (
+    uploadQueue.length > 0
+  ) {
+
+    queueStatusEl.textContent =
+      uploadQueue.length +
+      (
+        uploadQueue.length === 1
+          ? " unsaved entry recovered"
+          : " unsaved entries recovered"
+      );
+
+
+    queueStatusEl.className =
+      "status warning";
+
+
+    processUploadQueue();
+
+  }
+
+</script>
 
 </body>
 
