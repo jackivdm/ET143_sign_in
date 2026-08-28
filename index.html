@@ -120,10 +120,6 @@
       background: var(--secondary);
     }
 
-    button.danger {
-      background: var(--danger);
-    }
-
     button.large {
       padding: 18px;
       font-size: 18px;
@@ -179,6 +175,7 @@
       background: #166534;
     }
 
+
     /* =========================================
        LANDING PAGE
        ========================================= */
@@ -190,6 +187,7 @@
     .landing-card {
       padding: 18px;
     }
+
 
     /* =========================================
        COUNTERS
@@ -203,18 +201,14 @@
 
     .counter {
       flex: 1;
-
       background: var(--card);
-
       border-radius: 12px;
       padding: 10px;
-
       text-align: center;
     }
 
     .counter-label {
       color: var(--muted);
-
       font-size: 11px;
       font-weight: 700;
       letter-spacing: 1px;
@@ -222,10 +216,8 @@
 
     .counter-number {
       margin-top: 2px;
-
       font-size: 30px;
       font-weight: 800;
-
       line-height: 1;
     }
 
@@ -233,13 +225,13 @@
       color: #86efac;
     }
 
+
     /* =========================================
        SCAN CONFIRMATION
        ========================================= */
 
     #confirmation {
       height: 68px;
-
       margin-bottom: 10px;
 
       display: flex;
@@ -247,12 +239,10 @@
       justify-content: center;
 
       background: var(--card);
-
       border-radius: 12px;
 
       font-size: 24px;
       font-weight: 800;
-
       text-align: center;
 
       transition:
@@ -265,17 +255,15 @@
       transform: scale(1.02);
     }
 
+
     /* =========================================
        CAMERA
        ========================================= */
 
     #readerContainer {
       position: relative;
-
       width: 100%;
-
       background: #000;
-
       border-radius: 14px;
       overflow: hidden;
     }
@@ -290,17 +278,16 @@
 
       display: none;
 
-      background:
-        rgba(22, 163, 74, .35);
+      background: rgba(22, 163, 74, .35);
 
       pointer-events: none;
-
       z-index: 100;
     }
 
     #scanFlash.show {
       display: block;
     }
+
 
     /* =========================================
        RECENT ENTRIES
@@ -330,7 +317,6 @@
     #recentList {
       margin: 0;
       padding: 0;
-
       list-style: none;
     }
 
@@ -354,6 +340,7 @@
     .waiting {
       color: #fbbf24;
     }
+
 
     /* =========================================
        MANUAL ENTRY
@@ -383,6 +370,10 @@
       background: var(--success);
     }
 
+    #manualConfirmation.error {
+      background: #7f1d1d;
+    }
+
     #manualQueueStatus {
       margin-top: 10px;
 
@@ -391,7 +382,6 @@
       text-align: center;
       font-size: 13px;
     }
-
   </style>
 </head>
 
@@ -402,7 +392,7 @@
 
 
   <!-- ==================================================
-       LANDING PAGE
+       HOME
        ================================================== -->
 
   <div
@@ -416,7 +406,6 @@
       Choose a sign-in method
     </div>
 
-
     <div class="card landing-card">
 
       <button
@@ -426,7 +415,6 @@
       >
         Rapid Card Scanner
       </button>
-
 
       <button
         class="large secondary"
@@ -453,8 +441,6 @@
 
     <h2>Rapid Card Scanner</h2>
 
-
-    <!-- COUNTERS -->
 
     <div class="counters">
 
@@ -492,14 +478,10 @@
     </div>
 
 
-    <!-- LARGE CONFIRMATION -->
-
     <div id="confirmation">
       Ready
     </div>
 
-
-    <!-- CAMERA -->
 
     <div id="readerContainer">
 
@@ -510,8 +492,6 @@
     </div>
 
 
-    <!-- UPLOAD STATUS -->
-
     <div
       id="queueStatus"
       class="status"
@@ -519,8 +499,6 @@
       Ready
     </div>
 
-
-    <!-- SCANNER CONTROLS -->
 
     <button
       id="startButton"
@@ -560,8 +538,6 @@
     </button>
 
 
-    <!-- RECENT ENTRIES -->
-
     <div class="recent">
 
       <div class="recent-title">
@@ -600,8 +576,9 @@
         type="text"
         inputmode="numeric"
         pattern="[0-9]*"
+        maxlength="8"
         autocomplete="off"
-        placeholder="Enter student number"
+        placeholder="8-digit student number"
       >
 
 
@@ -655,8 +632,10 @@
   // ==================================================
 
   /*
-    Replace this with your Apps Script
-    Web App URL ending in /exec
+    Replace this with your Apps Script Web App URL.
+
+    IMPORTANT:
+    It must end in /exec
   */
 
   const API_URL =
@@ -664,13 +643,10 @@
 
 
   /*
-    Same-card lockout.
+    Ignore the SAME barcode for 2 seconds.
 
-    The SAME barcode will be ignored for
-    2 seconds after being accepted.
-
-    A DIFFERENT barcode can be accepted
-    immediately.
+    Different student cards can still be
+    scanned immediately one after another.
   */
 
   const DUPLICATE_LOCK_MS =
@@ -678,8 +654,8 @@
 
 
   /*
-    Maximum number of queued entries sent
-    to Apps Script in one request.
+    Maximum number of entries uploaded
+    to Google in one batch.
   */
 
   const BATCH_SIZE =
@@ -687,12 +663,47 @@
 
 
   /*
-    If entries remain unsaved, retry every
-    2 seconds.
+    Retry unsaved entries every 2 seconds.
   */
 
   const RETRY_INTERVAL_MS =
     2000;
+
+
+
+  // ==================================================
+  // STUDENT NUMBER VALIDATION
+  // ==================================================
+
+  /*
+    Valid student number:
+
+    - exactly 8 digits
+    - numbers only
+    - first digit must be 1, 2 or 3
+
+    Examples:
+
+    12345678  VALID
+    23456789  VALID
+    34567890  VALID
+
+    02345678  INVALID
+    42345678  INVALID
+    1234567   INVALID
+    123456789 INVALID
+    12A45678  INVALID
+  */
+
+  function isValidStudentNumber(
+    value
+  ) {
+
+    return /^[123]\d{7}$/.test(
+      String(value).trim()
+    );
+
+  }
 
 
 
@@ -777,7 +788,8 @@
   // STATE
   // ==================================================
 
-  let scanner = null;
+  let scanner =
+    null;
 
   let uploadInProgress =
     false;
@@ -788,14 +800,6 @@
   let audioContext =
     null;
 
-
-  /*
-    Session counters.
-
-    These count entries accepted during
-    this page session.
-  */
-
   let scannedCount =
     0;
 
@@ -805,7 +809,7 @@
 
 
   // ==================================================
-  // LOAD UNSAVED QUEUE
+  // RECOVER UNSAVED QUEUE
   // ==================================================
 
   let uploadQueue = [];
@@ -831,7 +835,7 @@
 
 
   // ==================================================
-  // LOCAL QUEUE STORAGE
+  // LOCAL STORAGE
   // ==================================================
 
   function saveQueueLocally() {
@@ -861,7 +865,130 @@
 
 
   // ==================================================
-  // PAGE NAVIGATION
+  // AUDIO
+  // ==================================================
+
+  /*
+    Prime the audio system while the user is
+    pressing a button.
+
+    This improves beep reliability on mobile
+    browsers, particularly iPhones.
+  */
+
+  function primeAudio() {
+
+    try {
+
+      if (!audioContext) {
+
+        audioContext =
+          new (
+            window.AudioContext ||
+            window.webkitAudioContext
+          )();
+
+      }
+
+
+      if (
+        audioContext.state ===
+        "suspended"
+      ) {
+
+        audioContext.resume();
+
+      }
+
+    }
+
+    catch (error) {
+
+      console.log(
+        "Audio unavailable."
+      );
+
+    }
+
+  }
+
+
+
+  function playBeep() {
+
+    try {
+
+      if (!audioContext) {
+
+        audioContext =
+          new (
+            window.AudioContext ||
+            window.webkitAudioContext
+          )();
+
+      }
+
+
+      if (
+        audioContext.state ===
+        "suspended"
+      ) {
+
+        audioContext.resume();
+
+      }
+
+
+      const oscillator =
+        audioContext.createOscillator();
+
+
+      const gain =
+        audioContext.createGain();
+
+
+      oscillator.connect(
+        gain
+      );
+
+
+      gain.connect(
+        audioContext.destination
+      );
+
+
+      oscillator.frequency.value =
+        1100;
+
+
+      gain.gain.value =
+        0.15;
+
+
+      oscillator.start();
+
+
+      oscillator.stop(
+        audioContext.currentTime +
+        0.09
+      );
+
+    }
+
+    catch (error) {
+
+      console.log(
+        "Audio unavailable."
+      );
+
+    }
+
+  }
+
+
+
+  // ==================================================
+  // NAVIGATION
   // ==================================================
 
   function showView(view) {
@@ -901,10 +1028,8 @@
 
   async function goToManual() {
 
-    /*
-      Stop the camera while manually
-      entering a student number.
-    */
+    primeAudio();
+
 
     await stopScanner();
 
@@ -916,6 +1041,7 @@
 
     manualConfirmation.textContent =
       "Ready";
+
 
     manualConfirmation.className =
       "";
@@ -939,16 +1065,18 @@
 
   async function goToScanner() {
 
+    /*
+      Prime audio while this is still associated
+      with the user's button press.
+    */
+
+    primeAudio();
+
+
     showView(
       scannerView
     );
 
-
-    /*
-      Because this function originates from
-      a button press, browsers should allow
-      camera access here.
-    */
 
     await startScanner();
 
@@ -987,10 +1115,17 @@
       "status";
 
 
-    if (waiting === 0) {
+    if (
+      waiting === 0
+    ) {
 
       queueStatusEl.textContent =
         "All entries saved ✔";
+
+
+      queueStatusEl.classList.add(
+        "success"
+      );
 
     }
 
@@ -1024,7 +1159,9 @@
       uploadQueue.length;
 
 
-    if (waiting === 0) {
+    if (
+      waiting === 0
+    ) {
 
       manualQueueStatus.textContent =
         "All entries saved ✔";
@@ -1094,6 +1231,9 @@
     }
 
 
+    primeAudio();
+
+
     confirmationEl.textContent =
       "Starting camera…";
 
@@ -1153,22 +1293,27 @@
       );
 
 
-      /*
-        Make sure this scanner wasn't stopped
-        while it was starting.
-      */
-
       if (
         scanner !== newScanner
       ) {
 
         try {
+
           await newScanner.stop();
-        } catch (error) {}
+
+        }
+
+        catch (error) {}
+
 
         try {
+
           newScanner.clear();
-        } catch (error) {}
+
+        }
+
+        catch (error) {}
+
 
         return;
 
@@ -1293,7 +1438,7 @@
 
 
   // ==================================================
-  // SUCCESSFUL BARCODE READ
+  // SUCCESSFUL BARCODE DECODE
   // ==================================================
 
   function onScanSuccess(
@@ -1306,9 +1451,39 @@
       ).trim();
 
 
-    if (!barcode) {
+
+    /*
+      ==================================================
+      VALIDATION
+
+      Do absolutely nothing unless the decoded
+      value is a valid student number.
+
+      It must:
+        - contain exactly 8 digits
+        - start with 1, 2 or 3
+
+      A bad barcode read therefore gets:
+
+        NO beep
+        NO vibration
+        NO green flash
+        NO SCANNED increment
+        NO queue entry
+        NO Google Sheets entry
+      ==================================================
+    */
+
+    if (
+      !isValidStudentNumber(
+        barcode
+      )
+    ) {
+
       return;
+
     }
+
 
 
     const now =
@@ -1318,11 +1493,12 @@
 
     /*
       ==================================================
-      TWO-SECOND SAME-CARD LOCKOUT
+      2-SECOND SAME-CARD LOCKOUT
 
-      This ONLY blocks the same barcode.
+      This only blocks the SAME student number.
 
-      A different card can be scanned immediately.
+      A different valid card can be accepted
+      immediately.
       ==================================================
     */
 
@@ -1344,8 +1520,7 @@
 
 
     /*
-      Remove old entries from the duplicate
-      tracking object.
+      Clean old values out of memory.
     */
 
     for (
@@ -1369,7 +1544,7 @@
 
 
     /*
-      Accept immediately.
+      Accept the student immediately.
 
       We do NOT wait for Google Sheets.
     */
@@ -1391,11 +1566,6 @@
   // ==================================================
   // ACCEPT ENTRY
   // ==================================================
-
-  /*
-    Barcode scans and manual entries both
-    enter the same queue here.
-  */
 
   function acceptEntry(
     studentNumber,
@@ -1448,9 +1618,9 @@
 
 
     /*
-      Start background upload immediately.
+      Start uploading in the background.
 
-      This does not block the scanner.
+      Scanner remains available immediately.
     */
 
     processUploadQueue();
@@ -1465,35 +1635,34 @@
 
   function saveManualEntry() {
 
+    primeAudio();
+
+
     const studentNumber =
-      manualStudentNumber.value
+      manualStudentNumber
+        .value
         .trim();
-
-
-    if (!studentNumber) {
-
-      manualConfirmation.textContent =
-        "Enter a student number";
-
-      return;
-
-    }
 
 
 
     /*
-      Require numeric characters for manual
-      student numbers.
+      Apply exactly the same student-number
+      validation as the barcode scanner.
     */
 
     if (
-      !/^[0-9]+$/.test(
+      !isValidStudentNumber(
         studentNumber
       )
     ) {
 
       manualConfirmation.textContent =
-        "Student number must contain numbers only";
+        "Must be 8 digits and start with 1, 2 or 3";
+
+
+      manualConfirmation.className =
+        "error";
+
 
       return;
 
@@ -1557,8 +1726,7 @@
 
 
   /*
-    Pressing Enter on the phone keyboard
-    saves the manual entry.
+    Press Enter on the keyboard to save.
   */
 
   manualStudentNumber.addEventListener(
@@ -1571,6 +1739,7 @@
 
         event.preventDefault();
 
+
         saveManualEntry();
 
       }
@@ -1580,8 +1749,28 @@
 
 
 
+  /*
+    Remove anything except digits if somebody
+    pastes or types unusual characters into
+    the manual field.
+  */
+
+  manualStudentNumber.addEventListener(
+    "input",
+    function() {
+
+      this.value =
+        this.value
+          .replace(/\D/g, "")
+          .slice(0, 8);
+
+    }
+  );
+
+
+
   // ==================================================
-  // SCAN CONFIRMATION
+  // SUCCESSFUL SCAN FEEDBACK
   // ==================================================
 
   function showSuccessfulScan(
@@ -1589,7 +1778,7 @@
   ) {
 
     /*
-      LARGE GREEN CONFIRMATION
+      Large green confirmation.
     */
 
     confirmationEl.textContent =
@@ -1603,7 +1792,7 @@
 
 
     /*
-      GREEN CAMERA FLASH
+      Green camera flash.
     */
 
     scanFlashEl.classList.add(
@@ -1625,7 +1814,8 @@
 
 
     /*
-      Return confirmation box to Ready.
+      Return to ready state quickly so the next
+      student can be scanned.
     */
 
     setTimeout(
@@ -1646,7 +1836,7 @@
 
 
     /*
-      VIBRATION
+      Vibration.
     */
 
     if (
@@ -1662,95 +1852,10 @@
 
 
     /*
-      BEEP
+      Beep.
     */
 
     playBeep();
-
-  }
-
-
-
-  // ==================================================
-  // BEEP
-  // ==================================================
-
-  function playBeep() {
-
-    try {
-
-      if (!audioContext) {
-
-        audioContext =
-          new (
-            window.AudioContext ||
-            window.webkitAudioContext
-          )();
-
-      }
-
-
-
-      /*
-        Some mobile browsers suspend the
-        audio context until user interaction.
-      */
-
-      if (
-        audioContext.state ===
-        "suspended"
-      ) {
-
-        audioContext.resume();
-
-      }
-
-
-      const oscillator =
-        audioContext
-          .createOscillator();
-
-
-      const gain =
-        audioContext
-          .createGain();
-
-
-      oscillator.connect(
-        gain
-      );
-
-
-      gain.connect(
-        audioContext.destination
-      );
-
-
-      oscillator.frequency.value =
-        1100;
-
-
-      gain.gain.value =
-        0.15;
-
-
-      oscillator.start();
-
-
-      oscillator.stop(
-        audioContext.currentTime +
-        0.09
-      );
-
-    }
-
-    catch (error) {
-
-      console.log(
-        "Audio unavailable."
-      );
-
-    }
 
   }
 
@@ -1771,10 +1876,10 @@
 
 
     /*
-      Give this visible list item a temporary
-      local identifier.
+      Local identifier used only for updating
+      the on-screen recent list.
 
-      This is NOT sent to Google Sheets.
+      It is NOT sent to Google Sheets.
     */
 
     const localId =
@@ -1816,7 +1921,7 @@
 
 
     /*
-      Keep the last 8 visible entries.
+      Keep only the last 8 entries visible.
     */
 
     while (
@@ -1831,10 +1936,6 @@
     }
 
 
-    /*
-      Save localId into localStorage as well.
-    */
-
     saveQueueLocally();
 
   }
@@ -1842,15 +1943,19 @@
 
 
   // ==================================================
-  // MARK ENTRY SAVED
+  // MARK RECENT ENTRY AS SAVED
   // ==================================================
 
   function markEntrySaved(
     entry
   ) {
 
-    if (!entry.localId) {
+    if (
+      !entry.localId
+    ) {
+
       return;
+
     }
 
 
@@ -1894,8 +1999,8 @@
   async function processUploadQueue() {
 
     /*
-      Don't start another uploader if one
-      is already running.
+      Only allow one uploader to operate at
+      a time on this phone.
     */
 
     if (
@@ -1925,8 +2030,8 @@
     try {
 
       /*
-        Keep sending batches until the queue
-        is empty or a network/server error occurs.
+        Continue until everything has been saved
+        or we encounter a network/server error.
       */
 
       while (
@@ -1934,10 +2039,10 @@
       ) {
 
         /*
-          Take up to BATCH_SIZE entries.
+          Take the first entries from the queue.
 
-          Do NOT remove them from the real queue
-          until Google confirms success.
+          They remain in the real queue until
+          Google confirms that they were saved.
         */
 
         const batch =
@@ -1950,11 +2055,13 @@
         const payloadEntries =
           batch.map(
             entry => ({
+
               studentNumber:
                 entry.studentNumber,
 
               method:
                 entry.method
+
             })
           );
 
@@ -1972,14 +2079,13 @@
                   "POST",
 
                 /*
-                  Deliberately do NOT add:
+                  Do NOT add:
 
                   Content-Type: application/json
 
-                  Keeping this as a simple POST
-                  works better with the Apps
-                  Script Web App cross-origin
-                  setup.
+                  Sending the JSON as the plain
+                  request body avoids unnecessary
+                  CORS problems with Apps Script.
                 */
 
                 body:
@@ -2018,16 +2124,17 @@
 
 
 
-          /*
-            Apps Script tells us how many
-            records it wrote.
-          */
-
           const numberSaved =
             Number(
               data.saved || 0
             );
 
+
+
+          /*
+            Only remove the batch if the server
+            confirms every entry was saved.
+          */
 
           if (
             numberSaved !==
@@ -2042,10 +2149,6 @@
 
 
 
-          /*
-            Mark visible recent entries saved.
-          */
-
           for (
             const entry of batch
           ) {
@@ -2059,8 +2162,10 @@
 
 
           /*
-            NOW remove the confirmed batch
-            from the queue.
+            Google has confirmed the save.
+
+            We can now safely remove these entries
+            from the phone's pending queue.
           */
 
           uploadQueue.splice(
@@ -2106,10 +2211,10 @@
 
 
           /*
-            Leave everything in the queue.
+            Do not delete anything.
 
-            The automatic retry timer will
-            try again shortly.
+            The pending entries remain on the
+            phone and will be retried.
           */
 
           break;
@@ -2132,7 +2237,7 @@
 
 
   // ==================================================
-  // AUTOMATIC RETRY
+  // AUTOMATIC UPLOAD RETRY
   // ==================================================
 
   setInterval(
@@ -2202,8 +2307,9 @@
 
 
   /*
-    If the browser was refreshed while entries
-    were waiting, recover them and try again.
+    If the browser was closed/refreshed while
+    entries were waiting to upload, recover
+    those entries and try again.
   */
 
   if (
@@ -2230,5 +2336,4 @@
 </script>
 
 </body>
-
 </html>
